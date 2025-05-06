@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../database_updated");
+const db = require("../database");
 
 router.get("/", (req, res) => {
   db.all("SELECT * FROM companies", [], (err, rows) => {

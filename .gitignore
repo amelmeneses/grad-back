@@ -135,3 +135,9 @@ dist
 *.sqlite3
 *.db-wal
 *.db-shm
+
+# Ignorar el archivo .env
+.env
+
+# Ignorar la carpeta node_modules
+node_modules/

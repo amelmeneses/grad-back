@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../database_updated");
+const db = require("../database");
 
 // Obtener todos los servicios
 router.get("/", (req, res) => {
