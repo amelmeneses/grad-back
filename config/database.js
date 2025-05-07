@@ -1,4 +1,5 @@
 const sqlite3 = require("sqlite3").verbose();
+const bcrypt = require("bcryptjs");
 
 // Crear y conectar la base de datos
 const db = new sqlite3.Database("./playbooker.db", (err) => {
@@ -82,6 +83,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla empresas creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,6 +95,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla horarios_funcionamiento creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS canchas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -104,6 +107,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla canchas creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS calendario_disponibilidad (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,6 +121,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla calendario_disponibilidad creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS servicios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -127,6 +132,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla servicios creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS reservas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -141,6 +147,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla reservas creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS reserva_servicios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -151,6 +158,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla reserva_servicios creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS pagos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -163,6 +171,7 @@ function initializeDB() {
       );
     `);
     console.log("Tabla pagos creada.");
+
     db.run(`
       CREATE TABLE IF NOT EXISTS tarifas_alquiler (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -175,6 +184,34 @@ function initializeDB() {
       );
     `);
     console.log("Tabla tarifas_alquiler creada.");
+
+    // Crear el rol admin
+    db.run(`
+      INSERT INTO roles (nombre, descripcion) 
+      VALUES ('admin', 'Administrador con acceso total');
+    `, (err) => {
+      if (err) console.error("Error al insertar el rol admin:", err);
+    });
+
+    // Crear un usuario admin con contraseña encriptada
+    const password = 'sabineamel12@';
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        console.error("Error al encriptar la contraseña:", err);
+      } else {
+        db.run(`
+          INSERT INTO usuarios (nombre, apellido, email, contrasena, rol_id, fecha_creacion)
+          VALUES ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, CURRENT_TIMESTAMP);
+        `, [hashedPassword], (err) => {
+          if (err) {
+            console.error("Error al insertar el usuario admin:", err);
+          } else {
+            console.log("Usuario admin creado exitosamente.");
+          }
+        });
+      }
+    });
+
     console.log("Tablas creadas correctamente.");
   });
 }
