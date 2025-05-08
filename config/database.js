@@ -1,7 +1,5 @@
-const sqlite3 = require("sqlite3").verbose();
 const bcrypt = require("bcryptjs");
-
-// Crear y conectar la base de datos
+const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./playbooker.db", (err) => {
   if (err) {
     console.error("Error connecting to SQLite:", err);
@@ -12,40 +10,20 @@ const db = new sqlite3.Database("./playbooker.db", (err) => {
 
 // Función para inicializar la base de datos
 function initializeDB() {
-  console.log('Inicializando la base de datos...'); // Log para verificar si la función se está ejecutando
-  
+  console.log('Inicializando la base de datos...');
+
   db.serialize(() => {
     // Eliminar tablas existentes (opcional, solo para desarrollo o reiniciar)
-    db.run("DROP TABLE IF EXISTS reserva_servicios", (err) => {
-      if (err) console.error("Error al eliminar tabla reserva_servicios:", err);
-    });
-    db.run("DROP TABLE IF EXISTS reservas", (err) => {
-      if (err) console.error("Error al eliminar tabla reservas:", err);
-    });
-    db.run("DROP TABLE IF EXISTS servicios", (err) => {
-      if (err) console.error("Error al eliminar tabla servicios:", err);
-    });
-    db.run("DROP TABLE IF EXISTS canchas", (err) => {
-      if (err) console.error("Error al eliminar tabla canchas:", err);
-    });
-    db.run("DROP TABLE IF EXISTS usuarios", (err) => {
-      if (err) console.error("Error al eliminar tabla usuarios:", err);
-    });
-    db.run("DROP TABLE IF EXISTS empresas", (err) => {
-      if (err) console.error("Error al eliminar tabla empresas:", err);
-    });
-    db.run("DROP TABLE IF EXISTS horarios_funcionamiento", (err) => {
-      if (err) console.error("Error al eliminar tabla horarios_funcionamiento:", err);
-    });
-    db.run("DROP TABLE IF EXISTS calendario_disponibilidad", (err) => {
-      if (err) console.error("Error al eliminar tabla calendario_disponibilidad:", err);
-    });
-    db.run("DROP TABLE IF EXISTS tarifas_alquiler", (err) => {
-      if (err) console.error("Error al eliminar tabla tarifas_alquiler:", err);
-    });
-    db.run("DROP TABLE IF EXISTS pagos", (err) => {
-      if (err) console.error("Error al eliminar tabla pagos:", err);
-    });
+    db.run("DROP TABLE IF EXISTS reserva_servicios");
+    db.run("DROP TABLE IF EXISTS reservas");
+    db.run("DROP TABLE IF EXISTS servicios");
+    db.run("DROP TABLE IF EXISTS canchas");
+    db.run("DROP TABLE IF EXISTS usuarios");
+    db.run("DROP TABLE IF EXISTS empresas");
+    db.run("DROP TABLE IF EXISTS horarios_funcionamiento");
+    db.run("DROP TABLE IF EXISTS calendario_disponibilidad");
+    db.run("DROP TABLE IF EXISTS tarifas_alquiler");
+    db.run("DROP TABLE IF EXISTS pagos");
 
     console.log("Tablas existentes eliminadas.");
 
@@ -185,12 +163,41 @@ function initializeDB() {
     `);
     console.log("Tabla tarifas_alquiler creada.");
 
-    // Crear el rol admin
-    db.run(`
-      INSERT INTO roles (nombre, descripcion) 
-      VALUES ('admin', 'Administrador con acceso total');
-    `, (err) => {
-      if (err) console.error("Error al insertar el rol admin:", err);
+    // Eliminar todos los roles para evitar duplicados
+    db.run("DELETE FROM roles", (err) => {
+      if (err) {
+        console.error("Error al eliminar roles anteriores:", err);
+      } else {
+        console.log("Roles anteriores eliminados.");
+        // Reiniciar el contador de AUTOINCREMENT
+        db.run("VACUUM", (err) => {  // Reinicia el contador de AUTOINCREMENT
+          if (err) {
+            console.error("Error al reiniciar el contador de AUTOINCREMENT:", err);
+          } else {
+            console.log("Contador AUTOINCREMENT reiniciado.");
+          }
+        });
+      }
+    });
+
+    // Insertar los tres roles necesarios: admin, usuarios, empresas
+    const roles = [
+      { nombre: 'admin', descripcion: 'Administrador con acceso total' },
+      { nombre: 'usuarios', descripcion: 'Usuarios regulares con acceso limitado' },
+      { nombre: 'empresas', descripcion: 'Representantes de empresas para gestión de reservas' },
+    ];
+
+    roles.forEach((role) => {
+      db.run(`
+        INSERT INTO roles (nombre, descripcion)
+        VALUES (?, ?)
+      `, [role.nombre, role.descripcion], (err) => {
+        if (err) {
+          console.error(`Error al insertar el rol ${role.nombre}:`, err);
+        } else {
+          console.log(`Rol ${role.nombre} insertado exitosamente.`);
+        }
+      });
     });
 
     // Crear un usuario admin con contraseña encriptada
@@ -199,10 +206,12 @@ function initializeDB() {
       if (err) {
         console.error("Error al encriptar la contraseña:", err);
       } else {
-        db.run(`
+        // Insertar el usuario admin en la base de datos con la contraseña encriptada
+        const query = `
           INSERT INTO usuarios (nombre, apellido, email, contrasena, rol_id, fecha_creacion)
           VALUES ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, CURRENT_TIMESTAMP);
-        `, [hashedPassword], (err) => {
+        `;
+        db.run(query, [hashedPassword], (err) => {
           if (err) {
             console.error("Error al insertar el usuario admin:", err);
           } else {
