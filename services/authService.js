@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt    = require('jsonwebtoken');
 const { Usuario } = require('../models/userModel');  // Importamos el modelo de usuario
 const { Role } = require('../models/roleModel'); 
 
