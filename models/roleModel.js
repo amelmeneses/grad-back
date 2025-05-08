@@ -1,7 +1,10 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');  // Importamos la configuración de Sequelize
+// backend/models/roleModel.js
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-const Rol = sequelize.define('Rol', {
+class Role extends Sequelize.Model {}
+
+Role.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -16,6 +19,11 @@ const Rol = sequelize.define('Rol', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+}, {
+  sequelize,
+  modelName: 'Role',
+  tableName: 'roles',
+  timestamps: false,
 });
 
-module.exports = { Rol };
+module.exports = { Role };

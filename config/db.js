@@ -1,9 +1,10 @@
+// backend/config/db.js
 const { Sequelize } = require('sequelize');
 
-// Configuración de la base de datos SQLite
+// Correct path to the database file
 const sequelize = new Sequelize({
   dialect: 'sqlite',
-  storage: './db/playbooker.db', // Ruta del archivo SQLite
+  storage: './playbooker.db',  // Adjusted to match your path
 });
 
 module.exports = sequelize;

@@ -1,8 +1,11 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db');  // Importamos la configuración de Sequelize
+const { Sequelize, DataTypes } = require('sequelize');
+const sequelize = require('../config/db');  // Import sequelize instance
 const bcrypt = require('bcryptjs');
+const { Role } = require('./roleModel');  // Import the Role model
 
-const Usuario = sequelize.define('Usuario', {
+class Usuario extends Sequelize.Model {}
+
+Usuario.init({
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -29,7 +32,7 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'Roles',  // Hace referencia a la tabla de Roles
+      model: 'roles',  // Reference to the 'roles' table
       key: 'id',
     },
   },
@@ -37,15 +40,21 @@ const Usuario = sequelize.define('Usuario', {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
+}, {
+  sequelize,  // Pass the sequelize instance here
+  modelName: 'Usuario',  // Define model as 'Usuario'
+  tableName: 'usuarios',  // Map to 'usuarios' table
+  timestamps: false,
 });
 
-// Antes de crear o actualizar un usuario, encriptamos la contraseña
+// Define relationship between Usuario and Role
+Usuario.belongsTo(Role, { foreignKey: 'rol_id', as: 'Role' });
+
 Usuario.beforeCreate(async (usuario) => {
   const salt = await bcrypt.genSalt(10);
   usuario.contrasena = await bcrypt.hash(usuario.contrasena, salt);
 });
 
-// Antes de actualizar un usuario, encriptamos la nueva contraseña
 Usuario.beforeUpdate(async (usuario) => {
   if (usuario.contrasena && usuario.contrasena !== "") {
     const salt = await bcrypt.genSalt(10);

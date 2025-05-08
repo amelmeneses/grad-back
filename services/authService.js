@@ -1,11 +1,16 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const { Usuario } = require('../models/userModel');  // Importamos el modelo de usuario
+const { Role } = require('../models/roleModel'); 
 
 // Función para autenticar al usuario
 exports.loginUsuario = async (email, password) => {
-  const usuario = await Usuario.findOne({ where: { email }, include: ['Rol'] });
+  console.log("falla inicio", email, password);
+  const usuario = await Usuario.findOne({
+    where: { email },
+    include: [{ model: Role, as: 'Role' }] // Asegúrate de que la relación esté bien definida
+  });
 
+  console.log("usuario", usuario);
   if (!usuario) {
     throw new Error('Correo o contraseña inválidos');
   }

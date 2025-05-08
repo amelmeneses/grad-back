@@ -1,12 +1,13 @@
-
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const initializeDB = require("./config/database"); // Asegúrate de que la ruta de la base de datos sea correcta
+// backend/index.js
+const express = require('express');
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const initializeDB = require('./config/database'); // Asegúrate de que la ruta sea correcta
+const sequelize = require('./config/db');  // Importa sequelize correctamente
 const authRoutes = require("./routes/authRoutes"); // Importa las rutas de autenticación
 
-// Inicializar la base de datos
-initializeDB(); // Aquí se llama la función que crea las tablas en la base de datos
+// Inicializa la base de datos
+initializeDB(); 
 
 const app = express();
 
@@ -33,9 +34,13 @@ app.use("/api", authRoutes);  // Registra las rutas de autenticación bajo el pr
 // // app.use("/reservations", reservationRoutes);
 // // app.use("/services", serviceRoutes);
 
+// Sync models with the database
+sequelize.sync({ force: false }).then(() => {
+  console.log("Database synchronized");
+  // Aquí puedes agregar el código para arrancar el servidor
+});
 
-// Configuración del puerto
-const PORT = 5001;  // El backend escucha en el puerto 5001
+const PORT = 5001;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });

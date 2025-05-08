@@ -30,7 +30,7 @@ function initializeDB() {
     // Crear las tablas si no existen
     db.run(`
       CREATE TABLE IF NOT EXISTS roles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id INTEGER PRIMARY KEY,
         nombre VARCHAR(50),
         descripcion TEXT
       );
@@ -169,29 +169,21 @@ function initializeDB() {
         console.error("Error al eliminar roles anteriores:", err);
       } else {
         console.log("Roles anteriores eliminados.");
-        // Reiniciar el contador de AUTOINCREMENT
-        db.run("VACUUM", (err) => {  // Reinicia el contador de AUTOINCREMENT
-          if (err) {
-            console.error("Error al reiniciar el contador de AUTOINCREMENT:", err);
-          } else {
-            console.log("Contador AUTOINCREMENT reiniciado.");
-          }
-        });
       }
     });
 
     // Insertar los tres roles necesarios: admin, usuarios, empresas
     const roles = [
-      { nombre: 'admin', descripcion: 'Administrador con acceso total' },
-      { nombre: 'usuarios', descripcion: 'Usuarios regulares con acceso limitado' },
-      { nombre: 'empresas', descripcion: 'Representantes de empresas para gestión de reservas' },
+      { id: 1, nombre: 'admin', descripcion: 'Administrador con acceso total' },
+      { id: 2, nombre: 'usuarios', descripcion: 'Usuarios regulares con acceso limitado' },
+      { id: 3, nombre: 'empresas', descripcion: 'Representantes de empresas para gestión de reservas' },
     ];
 
     roles.forEach((role) => {
       db.run(`
-        INSERT INTO roles (nombre, descripcion)
-        VALUES (?, ?)
-      `, [role.nombre, role.descripcion], (err) => {
+        INSERT INTO roles (id, nombre, descripcion)
+        VALUES (?, ?, ?)
+      `, [role.id, role.nombre, role.descripcion], (err) => {
         if (err) {
           console.error(`Error al insertar el rol ${role.nombre}:`, err);
         } else {
