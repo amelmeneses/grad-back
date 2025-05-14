@@ -7,6 +7,6 @@ const router = express.Router();
 router.post('/register', registrarUsuario);
 
 // Listar todos los usuarios
-router.get('/users', listarUsuarios);
+//router.get('/users', listarUsuarios);
 
 module.exports = router;

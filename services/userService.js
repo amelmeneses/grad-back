@@ -25,15 +25,15 @@ exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_
   return nuevoUsuario;
 };
 
-// obtener todos los usuarios con su rol
-exports.getAllUsuarios = async () => {
-  return await Usuario.findAll({
-    attributes: ['id','nombre','apellido','email','fecha_creacion'],
-    include: [{
-      model: Role,
-      as: 'Role',
-      attributes: ['id','nombre']
-    }]
-  });
-};
+// // obtener todos los usuarios con su rol
+// exports.getAllUsuarios = async () => {
+//   return await Usuario.findAll({
+//     attributes: ['id','nombre','apellido','email','fecha_creacion'],
+//     include: [{
+//       model: Role,
+//       as: 'Role',
+//       attributes: ['id','nombre']
+//     }]
+//   });
+// };
 
