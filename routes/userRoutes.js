@@ -1,12 +1,10 @@
+// backend/routes/userRoutes.js
 const express = require('express');
-const { registrarUsuario } = require('../controllers/userController');
-
+const { registrarUsuario, listarUsuarios } = require('../controllers/userController');
+const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-// Ruta para registrar un nuevo usuario
 router.post('/register', registrarUsuario);
-
-// Listar todos los usuarios
-//router.get('/users', listarUsuarios);
+router.get('/users', authMiddleware, isAdmin, listarUsuarios);
 
 module.exports = router;
