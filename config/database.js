@@ -1,3 +1,5 @@
+// config/database.js
+
 const bcrypt = require("bcryptjs");
 const sqlite3 = require("sqlite3").verbose();
 const db = new sqlite3.Database("./playbooker.db", (err) => {
@@ -51,16 +53,19 @@ function initializeDB() {
     `);
     console.log("Tabla usuarios creada.");
 
+    // ---- Aquí actualizamos la tabla empresas para referenciar a usuarios (owner) ----
     db.run(`
       CREATE TABLE IF NOT EXISTS empresas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre VARCHAR(100),
         contacto_email VARCHAR(100),
         contacto_telefono VARCHAR(20),
-        direccion VARCHAR(255)
+        direccion VARCHAR(255),
+        usuario_id INTEGER,                   -- nuevo campo que guarda al owner
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
       );
     `);
-    console.log("Tabla empresas creada.");
+    console.log("Tabla empresas creada (con referencia a usuarios).");
 
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
@@ -163,59 +168,47 @@ function initializeDB() {
     `);
     console.log("Tabla tarifas_alquiler creada.");
 
-    // Eliminar todos los roles para evitar duplicados
-    db.run("DELETE FROM roles", (err) => {
-      if (err) {
-        console.error("Error al eliminar roles anteriores:", err);
-      } else {
-        console.log("Roles anteriores eliminados.");
-      }
+    // Semilla de roles
+    db.run("DELETE FROM roles", err => {
+      if (err) console.error("Error al eliminar roles anteriores:", err);
+      else console.log("Roles anteriores eliminados.");
     });
 
-    // Insertar los tres roles necesarios: admin, usuarios, empresas
     const roles = [
-      { id: 1, nombre: 'admin', descripcion: 'Administrador con acceso total' },
-      { id: 2, nombre: 'usuarios', descripcion: 'Usuarios regulares con acceso limitado' },
-      { id: 3, nombre: 'empresas', descripcion: 'Representantes de empresas para gestión de reservas' },
+      { id: 1, nombre: 'admin',    descripcion: 'Administrador con acceso total' },
+      { id: 2, nombre: 'usuarios', descripcion: 'Usuario regular con acceso limitado' },
+      { id: 3, nombre: 'empresas', descripcion: 'Representante de empresa' },
     ];
-
-    roles.forEach((role) => {
-      db.run(`
-        INSERT INTO roles (id, nombre, descripcion)
-        VALUES (?, ?, ?)
-      `, [role.id, role.nombre, role.descripcion], (err) => {
-        if (err) {
-          console.error(`Error al insertar el rol ${role.nombre}:`, err);
-        } else {
-          console.log(`Rol ${role.nombre} insertado exitosamente.`);
-        }
-      });
+    roles.forEach(role => {
+      db.run(
+        `INSERT INTO roles (id, nombre, descripcion) VALUES (?, ?, ?)`,
+        [role.id, role.nombre, role.descripcion],
+        err => err
+          ? console.error(`Error al insertar el rol ${role.nombre}:`, err)
+          : console.log(`Rol ${role.nombre} insertado.`)
+      );
     });
 
-    // Crear un usuario admin con contraseña encriptada
-    const password = 'sabineamel12@';
-    bcrypt.hash(password, 10, (err, hashedPassword) => {
-      if (err) {
-        console.error("Error al encriptar la contraseña:", err);
-      } else {
-        // Insertar el usuario admin en la base de datos con la contraseña encriptada
-        const query = `
-          INSERT INTO usuarios (nombre, apellido, email, contrasena, rol_id, fecha_creacion)
-          VALUES ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, CURRENT_TIMESTAMP);
-        `;
-        db.run(query, [hashedPassword], (err) => {
-          if (err) {
-            console.error("Error al insertar el usuario admin:", err);
-          } else {
-            console.log("Usuario admin creado exitosamente.");
-          }
-        });
+    // Usuario admin de ejemplo
+    const plainPwd = 'sabineamel12@';
+    bcrypt.hash(plainPwd, 10, (err, hashed) => {
+      if (err) console.error("Error al encriptar contraseña:", err);
+      else {
+        db.run(
+          `INSERT INTO usuarios 
+             (nombre, apellido, email, contrasena, rol_id, fecha_creacion)
+           VALUES 
+             ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, CURRENT_TIMESTAMP)`,
+          [hashed],
+          err => err
+            ? console.error("Error al crear admin:", err)
+            : console.log("Usuario admin creado exitosamente.")
+        );
       }
     });
 
-    console.log("Tablas creadas correctamente.");
+    console.log("Inicialización de tablas completada.");
   });
 }
 
-// Exportar la función para su uso en otros archivos
 module.exports = initializeDB;

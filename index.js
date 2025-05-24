@@ -13,7 +13,8 @@ const bodyParser = require('body-parser');
 const initializeDB = require('./config/database'); // Asegúrate de que la ruta sea correcta
 const sequelize = require('./config/db');  // Importa sequelize correctamente
 const authRoutes = require("./routes/authRoutes"); // Importa las rutas de autenticación
-const userRoutes = require("./routes/userRoutes");  
+const userRoutes = require("./routes/userRoutes");
+const roleRoutes = require('./routes/roleRoutes');
 
 // Inicializa la base de datos
 initializeDB(); 
@@ -39,6 +40,7 @@ app.use(bodyParser.urlencoded({ extended: true })); // Middleware para parsear c
 app.use("/api", authRoutes); 
 // Rutas de usuario (incluye GET /api/users protegido)
 app.use("/api", userRoutes);
+app.use('/api', roleRoutes);
 
  // Registra las rutas de autenticación bajo el prefijo '/api'
 // // app.use("/users", userRoutes);
