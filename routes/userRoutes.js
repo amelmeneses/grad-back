@@ -4,7 +4,8 @@ const {
   registrarUsuario,
   listarUsuarios,
   obtenerUsuario,
-  actualizarUsuario
+  actualizarUsuario,
+   eliminarUsuario
 } = require('../controllers/userController');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
@@ -20,5 +21,8 @@ router.get('/users/:id', authMiddleware, isAdmin, obtenerUsuario);
 
 // Actualizar por ID (sólo admin)
 router.put('/users/:id', authMiddleware, isAdmin, actualizarUsuario);
+
+// Eliminar 
+router.delete('/users/delete/:id', authMiddleware, isAdmin, eliminarUsuario); 
 
 module.exports = router;

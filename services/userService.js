@@ -3,6 +3,7 @@
 const bcrypt = require('bcryptjs');
 const { Usuario } = require('../models/userModel');
 const { Role }    = require('../models/roleModel');
+const { Empresa } = require('../models/empresaModel');
 
 // Función para registrar un nuevo usuario
 exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_id = 3 }) => {
@@ -72,4 +73,29 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
 
   await usuario.save();
   return usuario;
+};
+
+/**
+ * Elimina un usuario, pero primero comprueba si tiene empresas asociadas.
+ * Si existen, lanza un error para pedir eliminar la empresa primero.
+ */
+exports.deleteUsuarioById = async (id) => {
+  // 1) ¿Tiene empresas?
+  const empresas = await Empresa.findAll({ where: { usuario_id: id } });
+  if (empresas.length > 0) {
+    const err = new Error('El usuario tiene una empresa asociada. Elimínala primero.');
+    err.status = 400;
+    throw err;
+  }
+
+  // 2) Buscar usuario
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) {
+    const err = new Error('Usuario no encontrado');
+    err.status = 404;
+    throw err;
+  }
+
+  // 3) Borrar
+  await usuario.destroy();
 };

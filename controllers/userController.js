@@ -3,7 +3,8 @@ const {
   registrarNuevoUsuario,
   getAllUsuarios,
   getUsuarioById,
-  updateUsuarioById
+  updateUsuarioById,
+  deleteUsuarioById
 } = require('../services/userService');
 
 exports.registrarUsuario = async (req, res) => {
@@ -46,5 +47,16 @@ exports.actualizarUsuario = async (req, res) => {
     res.json(usuario);
   } catch (error) {
     res.status(error.status || 500).json({ message: error.message });
+  }
+};
+
+  // DELETE /api/users/:id
+ 
+exports.eliminarUsuario = async (req, res, next) => {
+  try {
+    await deleteUsuarioById(req.params.id);
+    res.status(204).end();
+  } catch (err) {
+    next(err);
   }
 };
