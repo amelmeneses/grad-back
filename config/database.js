@@ -176,8 +176,8 @@ function initializeDB() {
 
     const roles = [
       { id: 1, nombre: 'admin',    descripcion: 'Administrador con acceso total' },
-      { id: 2, nombre: 'usuarios', descripcion: 'Usuario regular con acceso limitado' },
-      { id: 3, nombre: 'empresas', descripcion: 'Representante de empresa' },
+      { id: 2, nombre: 'usuario', descripcion: 'Usuario regular con acceso limitado' },
+      { id: 3, nombre: 'empresa', descripcion: 'Representante de empresa' },
     ];
     roles.forEach(role => {
       db.run(

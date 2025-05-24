@@ -15,6 +15,7 @@ const sequelize = require('./config/db');  // Importa sequelize correctamente
 const authRoutes = require("./routes/authRoutes"); // Importa las rutas de autenticación
 const userRoutes = require("./routes/userRoutes");
 const roleRoutes = require('./routes/roleRoutes');
+const empresaRoutes = require('./routes/empresaRoutes');
 
 // Inicializa la base de datos
 initializeDB(); 
@@ -27,32 +28,16 @@ app.use(bodyParser.json()); // Middleware para parsear cuerpos de solicitud JSON
 app.use(bodyParser.urlencoded({ extended: true })); // Middleware para parsear cuerpos de solicitud con URL-encoded
 
 
-// // // Importar las rutas (definidas en los archivos correspondientes)
-// // const userRoutes = require("./routes/users");
-// // const companyRoutes = require("./routes/companies");
-// // const courtRoutes = require("./routes/courts");
-// // const reservationRoutes = require("./routes/reservations");
-// // const serviceRoutes = require("./routes/services");
-
-
-
 // Usar las rutas de autenticación
 app.use("/api", authRoutes); 
 // Rutas de usuario (incluye GET /api/users protegido)
 app.use("/api", userRoutes);
 app.use('/api', roleRoutes);
-
- // Registra las rutas de autenticación bajo el prefijo '/api'
-// // app.use("/users", userRoutes);
-// // app.use("/companies", companyRoutes);
-// // app.use("/courts", courtRoutes);
-// // app.use("/reservations", reservationRoutes);
-// // app.use("/services", serviceRoutes);
+app.use('/api', empresaRoutes);
 
 // Sync models with the database
 sequelize.sync({ force: false }).then(() => {
   console.log("Database synchronized");
-  // Aquí puedes agregar el código para arrancar el servidor
 });
 
 const PORT = 5001;
