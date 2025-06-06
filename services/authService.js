@@ -15,7 +15,7 @@ exports.loginUsuario = async (email, password) => {
   if (!usuario) {
     throw new Error('Correo o contraseña inválidos');
   }
-
+  // 2) Comparamos contraseñas
   const match = await bcrypt.compare(password, usuario.contrasena);
   if (!match) {
     throw new Error('Correo o contraseña inválidos');

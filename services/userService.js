@@ -17,14 +17,15 @@ exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_
     apellido,
     email,
     contrasena: hashedPassword,
-    rol_id
+    rol_id,
+    estado: 1, // por defecto activo
   });
 };
 
-// Obtener todos los usuarios con su rol
+// Obtener todos los usuarios con su rol (sin incluir contrasena)
 exports.getAllUsuarios = async () => {
   return await Usuario.findAll({
-    attributes: ['id', 'nombre', 'apellido', 'email', 'fecha_creacion'],
+    attributes: ['id', 'nombre', 'apellido', 'email', 'estado', 'fecha_creacion', 'rol_id'],
     include: [{
       model: Role,
       as: 'Role',
@@ -33,10 +34,10 @@ exports.getAllUsuarios = async () => {
   });
 };
 
-// ** NUEVO **: Obtener un usuario por su ID (con rol)
+// Obtener un usuario por su ID (con rol)
 exports.getUsuarioById = async (id) => {
   const usuario = await Usuario.findByPk(id, {
-    attributes: ['id', 'nombre', 'apellido', 'email', 'fecha_creacion', 'rol_id'],
+    attributes: ['id', 'nombre', 'apellido', 'email', 'estado', 'fecha_creacion', 'rol_id'],
     include: [{
       model: Role,
       as: 'Role',
@@ -51,8 +52,8 @@ exports.getUsuarioById = async (id) => {
   return usuario;
 };
 
-// ** NUEVO **: Actualizar un usuario por su ID
-exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, rol_id }) => {
+// Actualizar un usuario por su ID
+exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, rol_id, estado }) => {
   const usuario = await Usuario.findByPk(id);
   if (!usuario) {
     const err = new Error('Usuario no encontrado');
@@ -60,7 +61,7 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
     throw err;
   }
 
-  // Si nos llega una contraseña nueva, la hasheamos
+  // Si nos llega una contraseña nueva, la hasheamos (si no, no la tocamos)
   if (contrasena) {
     usuario.contrasena = await bcrypt.hash(contrasena, 10);
   }
@@ -70,6 +71,7 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
   usuario.apellido = apellido;
   usuario.email    = email;
   usuario.rol_id   = rol_id;
+  usuario.estado   = typeof estado !== 'undefined' ? estado : usuario.estado;
 
   await usuario.save();
   return usuario;

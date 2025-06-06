@@ -1,3 +1,5 @@
+// backend/index.js
+
 process.on('uncaughtException', (err) => {
   console.error('Uncaught exception:', err);
 });
@@ -5,43 +7,51 @@ process.on('unhandledRejection', (reason) => {
   console.error('Unhandled Rejection:', reason);
 });
 
-// backend/index.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const initializeDB = require('./config/database'); // Asegúrate de que la ruta sea correcta
-const sequelize = require('./config/db');  // Importa sequelize correctamente
-const authRoutes = require("./routes/authRoutes"); // Importa las rutas de autenticación
-const userRoutes = require("./routes/userRoutes");
-const roleRoutes = require('./routes/roleRoutes');
-const empresaRoutes = require('./routes/empresaRoutes');
 
-// Inicializa la base de datos
-initializeDB(); 
+// 1) Inicialización de la DB SQLite (raw‐SQL)
+const initializeDB = require('./config/database');
+
+// 2) Instancia de Sequelize para modelos
+const sequelize = require('./config/db');
+
+// 3) Importar rutas
+const authRoutes       = require('./routes/authRoutes');
+const userRoutes       = require('./routes/userRoutes');
+const roleRoutes       = require('./routes/roleRoutes');
+const empresaRoutes    = require('./routes/empresaRoutes');
+const facturacionRoutes = require('./routes/facturacionRoutes');
 
 const app = express();
 
-// Middleware
-app.use(cors()); // Habilitar CORS para permitir solicitudes entre dominios (desde el frontend)
-app.use(bodyParser.json()); // Middleware para parsear cuerpos de solicitud JSON
-app.use(bodyParser.urlencoded({ extended: true })); // Middleware para parsear cuerpos de solicitud con URL-encoded
+// Inicializar base SQLite (crea/recrea tablas)
+initializeDB();
 
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Usar las rutas de autenticación
-app.use("/api", authRoutes); 
-// Rutas de usuario (incluye GET /api/users protegido)
-app.use("/api", userRoutes);
+// Montar rutas bajo /api
+app.use('/api', authRoutes);
+app.use('/api', userRoutes);
 app.use('/api', roleRoutes);
 app.use('/api', empresaRoutes);
+app.use('/api', facturacionRoutes);
 
-// Sync models with the database
+// Middleware genérico para capturar y devolver errores en JSON
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ message: err.message });
+});
+
+// Sincronizar modelos Sequelize (no forzar borrado de tablas existentes)
 sequelize.sync({ force: false }).then(() => {
   console.log("Database synchronized");
+  const PORT = process.env.PORT || 5001;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
 });
-
-const PORT = 5001;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-

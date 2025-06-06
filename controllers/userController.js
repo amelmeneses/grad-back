@@ -1,4 +1,5 @@
 // backend/controllers/userController.js
+
 const {
   registrarNuevoUsuario,
   getAllUsuarios,
@@ -26,7 +27,7 @@ exports.listarUsuarios = async (req, res) => {
   }
 };
 
-// **NUEVO**: Obtener un solo usuario por ID
+// Obtener un solo usuario por ID
 exports.obtenerUsuario = async (req, res) => {
   try {
     const usuario = await getUsuarioById(req.params.id);
@@ -36,13 +37,13 @@ exports.obtenerUsuario = async (req, res) => {
   }
 };
 
-// **NUEVO**: Actualizar un usuario por ID
+// Actualizar un usuario por ID (incluye estado)
 exports.actualizarUsuario = async (req, res) => {
   try {
-    const { nombre, apellido, email, contrasena, rol_id } = req.body;
+    const { nombre, apellido, email, contrasena, rol_id, estado } = req.body;
     const usuario = await updateUsuarioById(
       req.params.id,
-      { nombre, apellido, email, contrasena, rol_id }
+      { nombre, apellido, email, contrasena, rol_id, estado }
     );
     res.json(usuario);
   } catch (error) {
@@ -50,8 +51,7 @@ exports.actualizarUsuario = async (req, res) => {
   }
 };
 
-  // DELETE /api/users/:id
- 
+// Eliminar un usuario
 exports.eliminarUsuario = async (req, res, next) => {
   try {
     await deleteUsuarioById(req.params.id);
