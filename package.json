@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+  "start": "node index.js",
+  "dev": "nodemon index.js",
+  "db:init": "node ./config/database.js",
+  "db:seed": "sqlite3 playbooker.db < seed.sql"
   },
   "keywords": [],
   "author": "",
