@@ -6,24 +6,30 @@ const {
   listarUsuarios,
   obtenerUsuario,
   actualizarUsuario,
-  eliminarUsuario
+  eliminarUsuario,
+  desactivarUsuario,
+  activarUsuario
 } = require('../controllers/userController');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 const router = express.Router();
 
-// Registrar (público) — POST /api/register
+// Registrar (público)
 router.post('/register', registrarUsuario);
 
-// Listar todos los usuarios (sólo admin) — GET /api/users
+// Listar todos (sólo admin)
 router.get('/users', authMiddleware, isAdmin, listarUsuarios);
 
-// Obtener uno por ID (sólo admin) — GET /api/users/:id
+// Obtener uno (sólo admin)
 router.get('/users/:id', authMiddleware, isAdmin, obtenerUsuario);
 
-// Actualizar por ID (sólo admin) — PUT /api/users/:id
+// Actualizar (sólo admin)
 router.put('/users/:id', authMiddleware, isAdmin, actualizarUsuario);
 
-// Eliminar un usuario (sólo admin) — DELETE /api/users/delete/:id
+// Desactivar / Activar (sólo admin)
+router.patch('/users/:id/desactivar', authMiddleware, isAdmin, desactivarUsuario);
+router.patch('/users/:id/activar',   authMiddleware, isAdmin, activarUsuario);
+
+// Eliminar (sólo admin)
 router.delete('/users/delete/:id', authMiddleware, isAdmin, eliminarUsuario);
 
 module.exports = router;
