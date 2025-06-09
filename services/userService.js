@@ -61,12 +61,10 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
     throw err;
   }
 
-  // Si nos llega una contraseña nueva, la hasheamos (si no, no la tocamos)
   if (contrasena) {
     usuario.contrasena = await bcrypt.hash(contrasena, 10);
   }
 
-  // Actualizamos el resto de campos
   usuario.nombre   = nombre;
   usuario.apellido = apellido;
   usuario.email    = email;
@@ -77,12 +75,8 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
   return usuario;
 };
 
-/**
- * Elimina un usuario, pero primero comprueba si tiene empresas asociadas.
- * Si existen, lanza un error para pedir eliminar la empresa primero.
- */
+// Eliminar un usuario (previo chequeo de empresas)
 exports.deleteUsuarioById = async (id) => {
-  // 1) ¿Tiene empresas?
   const empresas = await Empresa.findAll({ where: { usuario_id: id } });
   if (empresas.length > 0) {
     const err = new Error('El usuario tiene una empresa asociada. Elimínala primero.');
@@ -90,7 +84,6 @@ exports.deleteUsuarioById = async (id) => {
     throw err;
   }
 
-  // 2) Buscar usuario
   const usuario = await Usuario.findByPk(id);
   if (!usuario) {
     const err = new Error('Usuario no encontrado');
@@ -98,6 +91,18 @@ exports.deleteUsuarioById = async (id) => {
     throw err;
   }
 
-  // 3) Borrar
   await usuario.destroy();
+};
+
+// ** NUEVO **: Cambiar sólo el estado (activar / desactivar)
+exports.cambiarEstadoUsuario = async (id, nuevoEstado) => {
+  const usuario = await Usuario.findByPk(id);
+  if (!usuario) {
+    const err = new Error('Usuario no encontrado');
+    err.status = 404;
+    throw err;
+  }
+  usuario.estado = nuevoEstado;
+  await usuario.save();
+  return usuario;
 };
