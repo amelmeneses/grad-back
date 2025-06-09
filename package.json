@@ -5,8 +5,9 @@
   "scripts": {
   "start": "node index.js",
   "dev": "nodemon index.js",
-  "db:init": "node ./config/database.js",
-  "db:seed": "sqlite3 playbooker.db < seed.sql"
+  "db:export": "node scripts/exportSeed.js",
+  "db:export:data": "node scripts/exportSeed.js --data-only",
+  "db:import": "node scripts/importSeed.js"
   },
   "keywords": [],
   "author": "",
@@ -26,3 +27,6 @@
     "nodemon": "^3.1.9"
   }
 }
+
+
+

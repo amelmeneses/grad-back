@@ -1,0 +1,12 @@
+INSERT INTO roles VALUES(1,'admin','Administrador con acceso total');
+INSERT INTO roles VALUES(2,'usuario','Usuario regular con acceso limitado');
+INSERT INTO roles VALUES(3,'empresa','Representante de empresa');
+INSERT INTO usuarios VALUES(1,'Amel','Meneses','amelsabine@gmail.com','$2b$10$BvfFnyvUWCDsIStR/HTS4eLNMn8D1nl03WDHK/zM6LrImgWqYVMkS',1,1,'2025-06-09 15:51:50');
+INSERT INTO usuarios VALUES(3,'Daniel','Sanchez','danielsanchez@gmail.com','$2b$10$JpA1163yk8F9aqW9trW3seai4n/hJYAhdHOWZ6TjzHGi1Sd9ja0w2',2,1,'2025-06-06 22:54:55.924 +00:00');
+INSERT INTO usuarios VALUES(4,'Ariadna','Meneses','ariadnameneses@gmail.com','$2b$10$dk3TDHNp8ugqIFwZvl4iI.pUnlc0Kf9l2PtPs34aFgM09v7REG8sy',2,1,'2025-06-06 22:55:22.658 +00:00');
+INSERT INTO usuarios VALUES(5,'Sabine','Fabara','asmenesesi@puce.edu.ec','$2b$10$wdK/XQo1DTVYJ4zU4BgsYuQLYFBI1g/DpPc0dpU1xV1PDT36LyiCa',3,1,'2025-06-06 22:56:02.521 +00:00');
+INSERT INTO usuarios VALUES(6,'jose','Sevillano','josesevillano@hotmail.com','$2b$10$smeSV8cdr4cdoZZi5cb7O.lKVKkjKBq5GEkJD3R0oqWGhZzdXvsbK',3,1,'2025-06-06 22:57:47.118 +00:00');
+INSERT INTO empresas VALUES(1,'Justlift SA','jlgymec@gmail.com','0993804018','california alta',5);
+INSERT INTO empresas VALUES(2,'AVIANCACITO','aviancacito@gmail.com','0993804018','california',6);
+INSERT INTO sqlite_sequence VALUES('usuarios',6);
+INSERT INTO sqlite_sequence VALUES('empresas',2);
