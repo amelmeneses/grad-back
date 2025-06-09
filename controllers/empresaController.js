@@ -3,13 +3,21 @@ const empresaService = require('../services/empresaService');
 
 exports.listarEmpresas = async (req, res, next) => {
   try {
-    // Si viene query ?usuario_id=, filtramos por usuario
     if (req.query.usuario_id) {
       const empresas = await empresaService.getEmpresasByUsuario(req.query.usuario_id);
       return res.json(empresas);
     }
     const empresas = await empresaService.getAllEmpresas();
     res.json(empresas);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.obtenerEmpresa = async (req, res, next) => {
+  try {
+    const empresa = await empresaService.getEmpresaById(req.params.id);
+    res.json(empresa);
   } catch (err) {
     next(err);
   }

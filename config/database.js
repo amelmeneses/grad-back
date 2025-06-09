@@ -1,4 +1,4 @@
-// backend/config/database.js
+// config/database.js
 
 const bcrypt = require("bcryptjs");
 const sqlite3 = require("sqlite3").verbose();
@@ -19,9 +19,9 @@ function initializeDB() {
     db.run("DROP TABLE IF EXISTS reserva_servicios");
     db.run("DROP TABLE IF EXISTS reservas");
     db.run("DROP TABLE IF EXISTS servicios");
-    db.run("DROP TABLE IF EXISTS factura_servicios"); // si existiera
+    db.run("DROP TABLE IF EXISTS factura_servicios");
     db.run("DROP TABLE IF EXISTS facturacion");
-    db.run("DROP TABLE IF EXISTS facturas");            // nombre alternativo; no se usará
+    db.run("DROP TABLE IF EXISTS facturas");
     db.run("DROP TABLE IF EXISTS canchas");
     db.run("DROP TABLE IF EXISTS usuarios");
     db.run("DROP TABLE IF EXISTS empresas");
@@ -65,13 +65,13 @@ function initializeDB() {
         contacto_email VARCHAR(100),
         contacto_telefono VARCHAR(20),
         direccion VARCHAR(255),
-        usuario_id INTEGER,  -- owner
+        usuario_id INTEGER,
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
       );
     `);
     console.log("Tabla empresas creada (con referencia a usuarios).");
 
-    // 5) Crear tabla facturación (datos de facturación) → uno a muchos con usuarios
+    // 5) Crear tabla facturacion (datos de facturación) → uno a muchos con usuarios
     db.run(`
       CREATE TABLE IF NOT EXISTS facturacion (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,18 +99,19 @@ function initializeDB() {
     `);
     console.log("Tabla horarios_funcionamiento creada.");
 
-    // 7) Crear tabla canchas
+    // 7) Crear tabla canchas con el nuevo campo 'deporte'
     db.run(`
       CREATE TABLE IF NOT EXISTS canchas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre VARCHAR(100),
         descripcion TEXT,
         ubicacion VARCHAR(255),
+        deporte VARCHAR(50) NOT NULL,       -- tipo de deporte (futbol, basket, tenis, padel)
         empresa_id INTEGER,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id)
       );
     `);
-    console.log("Tabla canchas creada.");
+    console.log("Tabla canchas creada (con campo deporte).");
 
     // 8) Crear tabla calendario_disponibilidad
     db.run(`
@@ -241,4 +242,3 @@ function initializeDB() {
 }
 
 module.exports = initializeDB;
-

@@ -37,5 +37,7 @@ const Empresa = sequelize.define('Empresa', {
 
 // Relación Empresa → Usuario (owner)
 Empresa.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'Usuario' });
+// Relación Usuario → Empresas (1:N)
+Usuario.hasMany(Empresa, { foreignKey: 'usuario_id', as: 'Empresas' });
 
 module.exports = { Empresa };

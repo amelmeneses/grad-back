@@ -11,6 +11,16 @@ exports.getEmpresasByUsuario = async (usuario_id) => {
   });
 };
 
+exports.getEmpresaById = async (id) => {
+  const empresa = await Empresa.findByPk(id);
+  if (!empresa) {
+    const err = new Error('Empresa no encontrada');
+    err.status = 404;
+    throw err;
+  }
+  return empresa;
+};
+
 exports.createEmpresa = async (data) => {
   return await Empresa.create(data);
 };
