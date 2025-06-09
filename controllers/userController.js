@@ -5,7 +5,8 @@ const {
   getAllUsuarios,
   getUsuarioById,
   updateUsuarioById,
-  deleteUsuarioById
+  deleteUsuarioById,
+  cambiarEstadoUsuario
 } = require('../services/userService');
 
 exports.registrarUsuario = async (req, res) => {
@@ -27,7 +28,6 @@ exports.listarUsuarios = async (req, res) => {
   }
 };
 
-// Obtener un solo usuario por ID
 exports.obtenerUsuario = async (req, res) => {
   try {
     const usuario = await getUsuarioById(req.params.id);
@@ -37,7 +37,6 @@ exports.obtenerUsuario = async (req, res) => {
   }
 };
 
-// Actualizar un usuario por ID (incluye estado)
 exports.actualizarUsuario = async (req, res) => {
   try {
     const { nombre, apellido, email, contrasena, rol_id, estado } = req.body;
@@ -51,12 +50,29 @@ exports.actualizarUsuario = async (req, res) => {
   }
 };
 
-// Eliminar un usuario
 exports.eliminarUsuario = async (req, res, next) => {
   try {
     await deleteUsuarioById(req.params.id);
     res.status(204).end();
   } catch (err) {
     next(err);
+  }
+};
+
+exports.desactivarUsuario = async (req, res) => {
+  try {
+    await cambiarEstadoUsuario(req.params.id, 0);
+    res.json({ message: 'Usuario desactivado.' });
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message });
+  }
+};
+
+exports.activarUsuario = async (req, res) => {
+  try {
+    await cambiarEstadoUsuario(req.params.id, 1);
+    res.json({ message: 'Usuario activado.' });
+  } catch (error) {
+    res.status(error.status || 500).json({ message: error.message });
   }
 };
