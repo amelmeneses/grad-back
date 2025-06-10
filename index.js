@@ -24,6 +24,8 @@ const userRoutes          = require('./routes/userRoutes');
 const roleRoutes          = require('./routes/roleRoutes');
 const empresaRoutes       = require('./routes/empresaRoutes');
 const facturacionRoutes   = require('./routes/facturacionRoutes');
+const canchaRoutes        = require('./routes/canchaRoutes');
+
 
 const app = express();
 
@@ -41,6 +43,7 @@ app.use('/api', userRoutes);
 app.use('/api', roleRoutes);
 app.use('/api', empresaRoutes);
 app.use('/api', facturacionRoutes);
+app.use('/api', canchaRoutes);
 
 // Manejador de errores global
 app.use((err, req, res, next) => {
