@@ -9,17 +9,28 @@ const Cancha = sequelize.define('Cancha', {
     autoIncrement: true
   },
   nombre: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     allowNull: false
   },
+  descripcion: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  ubicacion: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   deporte: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(50),
     allowNull: false
   },
   empresa_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    references: { model: 'empresas', key: 'id' }
+    references: {
+      model: 'empresas',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'canchas',

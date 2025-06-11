@@ -2,7 +2,9 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 const { Usuario } = require('./userModel');
+const Cancha = require('./canchaModel'); // Importamos la clase Cancha
 
+// Definición del modelo Empresa
 const Empresa = sequelize.define('Empresa', {
   id: {
     type: DataTypes.INTEGER,
@@ -35,9 +37,11 @@ const Empresa = sequelize.define('Empresa', {
   timestamps: false
 });
 
-// Relación Empresa → Usuario (owner)
+// Asociaciones
 Empresa.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'Usuario' });
-// Relación Usuario → Empresas (1:N)
 Usuario.hasMany(Empresa, { foreignKey: 'usuario_id', as: 'Empresas' });
+
+// Asociación 1:N Empresa → Cancha
+Empresa.hasMany(Cancha, { foreignKey: 'empresa_id', as: 'courts' });
 
 module.exports = { Empresa };

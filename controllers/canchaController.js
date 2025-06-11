@@ -3,10 +3,14 @@ const canchaService = require('../services/canchaService');
 
 exports.listarCanchas = async (req, res, next) => {
   try {
-    const { empresa_id } = req.query;
-    const canchas = empresa_id
-      ? await canchaService.getByEmpresa(empresa_id)
+    // Aceptamos company_id (_case_) o empresa_id (spanish) o companyId (camel)
+    const rawId = req.query.company_id ?? req.query.empresa_id ?? req.query.companyId;
+    const empresaId = rawId ? Number(rawId) : null;
+
+    const canchas = empresaId
+      ? await canchaService.getByEmpresa(empresaId)
       : await canchaService.getAll();
+
     res.json(canchas);
   } catch (err) {
     next(err);
@@ -24,7 +28,24 @@ exports.obtenerCancha = async (req, res, next) => {
 
 exports.crearCancha = async (req, res, next) => {
   try {
-    const nueva = await canchaService.create(req.body);
+    // Destructuramos los campos que realmente llegan desde el frontend
+    const {
+      nombre,
+      descripcion,
+      ubicacion,
+      deporte,
+      empresa_id,
+      companyId  // opcional, por compatibilidad
+    } = req.body;
+
+    const nueva = await canchaService.create({
+      nombre:       nombre,
+      descripcion:  descripcion,
+      ubicacion:    ubicacion,
+      deporte:      deporte,
+      empresa_id:   empresa_id ?? companyId
+    });
+
     res.status(201).json(nueva);
   } catch (err) {
     next(err);
@@ -33,7 +54,23 @@ exports.crearCancha = async (req, res, next) => {
 
 exports.actualizarCancha = async (req, res, next) => {
   try {
-    const updated = await canchaService.updateById(req.params.id, req.body);
+    const {
+      nombre,
+      descripcion,
+      ubicacion,
+      deporte,
+      empresa_id,
+      companyId
+    } = req.body;
+
+    const updated = await canchaService.updateById(req.params.id, {
+      nombre:       nombre,
+      descripcion:  descripcion,
+      ubicacion:    ubicacion,
+      deporte:      deporte,
+      empresa_id:   empresa_id ?? companyId
+    });
+
     res.json(updated);
   } catch (err) {
     next(err);
