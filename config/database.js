@@ -1,8 +1,8 @@
 // config/database.js
 
-const bcrypt = require("bcryptjs");
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("./playbooker.db", (err) => {
+const bcrypt   = require("bcryptjs");
+const sqlite3  = require("sqlite3").verbose();
+const db       = new sqlite3.Database("./playbooker.db", (err) => {
   if (err) {
     console.error("Error connecting to SQLite:", err);
   } else {
@@ -10,12 +10,11 @@ const db = new sqlite3.Database("./playbooker.db", (err) => {
   }
 });
 
-// Función para inicializar la base de datos
 function initializeDB() {
   console.log('Inicializando la base de datos...');
 
   db.serialize(() => {
-    // 1) Eliminar tablas existentes (opcional, solo para desarrollo o reiniciar)
+    // — Drop existing tables for a clean slate (dev only) —
     db.run("DROP TABLE IF EXISTS reserva_servicios");
     db.run("DROP TABLE IF EXISTS reservas");
     db.run("DROP TABLE IF EXISTS servicios");
@@ -29,9 +28,10 @@ function initializeDB() {
     db.run("DROP TABLE IF EXISTS calendario_disponibilidad");
     db.run("DROP TABLE IF EXISTS tarifas_alquiler");
     db.run("DROP TABLE IF EXISTS pagos");
+    db.run("DROP TABLE IF EXISTS horarios_bloqueados");
     console.log("Tablas existentes eliminadas.");
 
-    // 2) Crear tabla roles
+    // roles
     db.run(`
       CREATE TABLE IF NOT EXISTS roles (
         id INTEGER PRIMARY KEY,
@@ -39,9 +39,8 @@ function initializeDB() {
         descripcion TEXT
       );
     `);
-    console.log("Tabla roles creada.");
 
-    // 3) Crear tabla usuarios (con campo 'estado' por defecto = 1)
+    // usuarios
     db.run(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,14 +49,13 @@ function initializeDB() {
         email VARCHAR(100) UNIQUE,
         contrasena VARCHAR(255),
         rol_id INTEGER,
-        estado INTEGER DEFAULT 1,          -- 1 = activo, 0 = inactivo
+        estado INTEGER DEFAULT 1,
         fecha_creacion TIMESTAMP,
         FOREIGN KEY (rol_id) REFERENCES roles(id)
       );
     `);
-    console.log("Tabla usuarios creada (con campo estado).");
 
-    // 4) Crear tabla empresas (relación a usuarios)
+    // empresas
     db.run(`
       CREATE TABLE IF NOT EXISTS empresas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -69,9 +67,8 @@ function initializeDB() {
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
       );
     `);
-    console.log("Tabla empresas creada (con referencia a usuarios).");
 
-    // 5) Crear tabla facturacion (datos de facturación) → uno a muchos con usuarios
+    // facturacion
     db.run(`
       CREATE TABLE IF NOT EXISTS facturacion (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,9 +81,8 @@ function initializeDB() {
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
       );
     `);
-    console.log("Tabla facturacion creada (datos de facturación).");
 
-    // 6) Crear tabla horarios_funcionamiento
+    // horarios_funcionamiento
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -97,23 +93,21 @@ function initializeDB() {
         FOREIGN KEY (empresa_id) REFERENCES empresas(id)
       );
     `);
-    console.log("Tabla horarios_funcionamiento creada.");
 
-    // 7) Crear tabla canchas con el nuevo campo 'deporte'
+    // canchas
     db.run(`
       CREATE TABLE IF NOT EXISTS canchas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nombre VARCHAR(100),
         descripcion TEXT,
         ubicacion VARCHAR(255),
-        deporte VARCHAR(50) NOT NULL,       -- tipo de deporte (futbol, basket, tenis, padel)
+        deporte VARCHAR(50) NOT NULL,
         empresa_id INTEGER,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id)
       );
     `);
-    console.log("Tabla canchas creada (con campo deporte).");
 
-    // 8) Crear tabla calendario_disponibilidad
+    // calendario_disponibilidad
     db.run(`
       CREATE TABLE IF NOT EXISTS calendario_disponibilidad (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -126,9 +120,8 @@ function initializeDB() {
         FOREIGN KEY (horario_funcionamiento_id) REFERENCES horarios_funcionamiento(id)
       );
     `);
-    console.log("Tabla calendario_disponibilidad creada.");
 
-    // 9) Crear tabla servicios
+    // servicios
     db.run(`
       CREATE TABLE IF NOT EXISTS servicios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -138,9 +131,8 @@ function initializeDB() {
         tipo VARCHAR(50)
       );
     `);
-    console.log("Tabla servicios creada.");
 
-    // 10) Crear tabla reservas
+    // reservas
     db.run(`
       CREATE TABLE IF NOT EXISTS reservas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -154,9 +146,8 @@ function initializeDB() {
         FOREIGN KEY (cancha_id) REFERENCES canchas(id)
       );
     `);
-    console.log("Tabla reservas creada.");
 
-    // 11) Crear tabla reserva_servicios
+    // reserva_servicios
     db.run(`
       CREATE TABLE IF NOT EXISTS reserva_servicios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -166,9 +157,8 @@ function initializeDB() {
         FOREIGN KEY (servicio_id) REFERENCES servicios(id)
       );
     `);
-    console.log("Tabla reserva_servicios creada.");
 
-    // 12) Crear tabla pagos
+    // pagos
     db.run(`
       CREATE TABLE IF NOT EXISTS pagos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -180,59 +170,58 @@ function initializeDB() {
         FOREIGN KEY (reserva_id) REFERENCES reservas(id)
       );
     `);
-    console.log("Tabla pagos creada.");
 
-    // 13) Crear tabla tarifas_alquiler
+    // tarifas_alquiler (now linked to canchas, with dia_semana + default flag)
     db.run(`
       CREATE TABLE IF NOT EXISTS tarifas_alquiler (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        empresa_id INTEGER,
-        deporte VARCHAR(50),
-        hora_inicio TIME,
-        hora_fin TIME,
-        tarifa DECIMAL(10,2),
-        FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+        cancha_id INTEGER NOT NULL,
+        dia_semana VARCHAR(20),
+        "default" INTEGER NOT NULL DEFAULT 0,
+        hora_inicio TIME NOT NULL,
+        hora_fin TIME NOT NULL,
+        tarifa DECIMAL(10,2) NOT NULL,
+        FOREIGN KEY (cancha_id) REFERENCES canchas(id)
       );
     `);
-    console.log("Tabla tarifas_alquiler creada.");
 
-    // 14) Semilla de roles
-    db.run("DELETE FROM roles", err => {
-      if (err) console.error("Error al eliminar roles anteriores:", err);
-      else console.log("Roles anteriores eliminados.");
-    });
+    // ** nuevos: horarios_bloqueados **
+    db.run(`
+      CREATE TABLE IF NOT EXISTS horarios_bloqueados (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cancha_id INTEGER NOT NULL,
+        fecha DATE NOT NULL,
+        hora_desde TIME NOT NULL,
+        hora_hasta TIME NOT NULL,
+        motivo TEXT,
+        FOREIGN KEY (cancha_id) REFERENCES canchas(id)
+      );
+    `);
+    console.log("Tabla horarios_bloqueados creada.");
 
-    const rolesSeed = [
+    // seed roles
+    db.run("DELETE FROM roles");
+    [
       { id: 1, nombre: 'admin',    descripcion: 'Administrador con acceso total' },
       { id: 2, nombre: 'usuario',  descripcion: 'Usuario regular con acceso limitado' },
       { id: 3, nombre: 'empresa',  descripcion: 'Representante de empresa' },
-    ];
-
-    rolesSeed.forEach(role => {
+    ].forEach(role => {
       db.run(
         `INSERT INTO roles (id, nombre, descripcion) VALUES (?, ?, ?)`,
-        [role.id, role.nombre, role.descripcion],
-        err => err
-          ? console.error(`Error al insertar el rol ${role.nombre}:`, err)
-          : console.log(`Rol ${role.nombre} insertado.`)
+        [role.id, role.nombre, role.descripcion]
       );
     });
 
-    // 15) Crear usuario admin de ejemplo
+    // seed an admin user
     const plainPwd = 'sabineamel12@';
     bcrypt.hash(plainPwd, 10, (errHash, hashed) => {
-      if (errHash) {
-        console.error("Error al encriptar contraseña:", errHash);
-      } else {
+      if (!errHash) {
         db.run(
           `INSERT INTO usuarios 
              (nombre, apellido, email, contrasena, rol_id, estado, fecha_creacion)
            VALUES 
              ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, 1, CURRENT_TIMESTAMP)`,
-          [hashed],
-          err2 => err2
-            ? console.error("Error al crear admin:", err2)
-            : console.log("Usuario admin creado exitosamente.")
+          [hashed]
         );
       }
     });

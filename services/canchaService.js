@@ -1,5 +1,5 @@
 // backend/services/canchaService.js
-const Cancha = require('../models/canchaModel');
+const { Cancha } = require('../models/canchaModel');
 
 exports.getAll = () =>
   Cancha.findAll();

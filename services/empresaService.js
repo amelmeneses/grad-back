@@ -1,13 +1,13 @@
 // backend/services/empresaService.js
 
 const { Empresa } = require('../models/empresaModel');
-const Cancha = require('../models/canchaModel');
+const { Cancha }  = require('../models/canchaModel');
 
 exports.getAllEmpresas = async () => {
   return await Empresa.findAll({
     include: [{
       model: Cancha,
-      as: 'courts',
+      as: 'Canchas',
       attributes: ['id', 'deporte']
     }]
   });
@@ -18,7 +18,7 @@ exports.getEmpresasByUsuario = async (usuario_id) => {
     where: { usuario_id },
     include: [{
       model: Cancha,
-      as: 'courts',
+      as: 'Canchas',
       attributes: ['id', 'deporte']
     }]
   });
@@ -28,7 +28,7 @@ exports.getEmpresaById = async (id) => {
   const empresa = await Empresa.findByPk(id, {
     include: [{
       model: Cancha,
-      as: 'courts',
+      as: 'Canchas',
       attributes: ['id', 'deporte']
     }]
   });
