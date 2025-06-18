@@ -1,13 +1,18 @@
 // backend/services/tarifaAlquilerService.js
 const { TarifaAlquiler } = require('../models/tarifaAlquilerModel');
 
-exports.getAllTarifas = (canchaId = null) => {
-  const where = canchaId ? { cancha_id: canchaId } : {};
-  return TarifaAlquiler.findAll({ where });
+exports.getAllTarifas = (canchaId) => {
+  // Filtrar siempre por cancha_id
+  console.log("Cancha ID:", canchaId);
+  return TarifaAlquiler.findAll({
+    where: { cancha_id: canchaId }
+  });
 };
 
-exports.getTarifaById = async (id) => {
-  const tarifa = await TarifaAlquiler.findByPk(id);
+exports.getTarifaById = async (canchaId, tariffId) => {
+  const tarifa = await TarifaAlquiler.findOne({
+    where: { cancha_id: canchaId, id: tariffId },
+  });
   if (!tarifa) {
     const err = new Error('Tarifa no encontrada');
     err.status = 404;
@@ -16,26 +21,16 @@ exports.getTarifaById = async (id) => {
   return tarifa;
 };
 
-exports.createTarifa = (data) => {
-  return TarifaAlquiler.create(data);
+exports.createTarifa = (data, canchaId) => {
+  return TarifaAlquiler.create({ ...data, cancha_id: canchaId });
 };
 
-exports.updateTarifaById = async (id, data) => {
-  const tarifa = await TarifaAlquiler.findByPk(id);
-  if (!tarifa) {
-    const err = new Error('Tarifa no encontrada');
-    err.status = 404;
-    throw err;
-  }
+exports.updateTarifaById = async (canchaId, id, data) => {
+  const tarifa = await exports.getTarifaById(canchaId, id);
   return tarifa.update(data);
 };
 
-exports.deleteTarifaById = async (id) => {
-  const tarifa = await TarifaAlquiler.findByPk(id);
-  if (!tarifa) {
-    const err = new Error('Tarifa no encontrada');
-    err.status = 404;
-    throw err;
-  }
+exports.deleteTarifaById = async (canchaId, id) => {
+  const tarifa = await exports.getTarifaById(canchaId, id);
   await tarifa.destroy();
 };

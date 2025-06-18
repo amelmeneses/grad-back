@@ -1,6 +1,6 @@
 // backend/routes/tarifaAlquilerRoutes.js
 const express = require('express');
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 const {
   listarTarifas,
   obtenerTarifa,
@@ -10,15 +10,36 @@ const {
 } = require('../controllers/tarifaAlquilerController');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 
-// Listar todas o filtrar por cancha_id
-router.get('/tarifas', authMiddleware, isAdmin, listarTarifas);
-// Obtener una
-router.get('/tarifas/:id', authMiddleware, isAdmin, obtenerTarifa);
-// Crear
-router.post('/tarifas', authMiddleware, isAdmin, crearTarifa);
-// Actualizar
-router.put('/tarifas/:id', authMiddleware, isAdmin, actualizarTarifa);
-// Eliminar
-router.delete('/tarifas/:id', authMiddleware, isAdmin, eliminarTarifa);
+// Todas las rutas bajo /api/canchas/:canchaId/tarifas
+router.get(
+  '/canchas/:canchaId/tarifas',
+  authMiddleware,
+  isAdmin,
+  listarTarifas
+);
+router.get(
+  '/canchas/:canchaId/tarifas/:tariffId',
+  authMiddleware,
+  isAdmin,
+  obtenerTarifa
+);
+router.post(
+  '/canchas/:canchaId/tarifas',
+  authMiddleware,
+  isAdmin,
+  crearTarifa
+);
+router.put(
+  '/canchas/:canchaId/tarifas/:tariffId',
+  authMiddleware,
+  isAdmin,
+  actualizarTarifa
+);
+router.delete(
+  '/canchas/:canchaId/tarifas/:id',
+  authMiddleware,
+  isAdmin,
+  eliminarTarifa
+);
 
 module.exports = router;
