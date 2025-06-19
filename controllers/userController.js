@@ -11,8 +11,8 @@ const {
 
 exports.registrarUsuario = async (req, res) => {
   try {
-    const { nombre, apellido, email, password, rol_id } = req.body;
-    const user = await registrarNuevoUsuario({ nombre, apellido, email, password, rol_id });
+    const { nombre, apellido, email, password, rol_id, estado } = req.body;
+    const user = await registrarNuevoUsuario({ nombre, apellido, email, password, rol_id, estado });
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });

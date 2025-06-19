@@ -6,19 +6,19 @@ const { Role }    = require('../models/roleModel');
 const { Empresa } = require('../models/empresaModel');
 
 // Función para registrar un nuevo usuario
-exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_id = 3 }) => {
+exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_id = 3, estado }) => {
   const usuarioExistente = await Usuario.findOne({ where: { email } });
   if (usuarioExistente) {
     throw new Error('El correo electrónico ya está registrado.');
   }
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // const hashedPassword = await bcrypt.hash(password, 10);
   return await Usuario.create({
     nombre,
     apellido,
     email,
-    contrasena: hashedPassword,
+    contrasena: password,
     rol_id,
-    estado: 1, // por defecto activo
+    estado,
   });
 };
 
@@ -62,7 +62,8 @@ exports.updateUsuarioById = async (id, { nombre, apellido, email, contrasena, ro
   }
 
   if (contrasena) {
-    usuario.contrasena = await bcrypt.hash(contrasena, 10);
+    // usuario.contrasena = await bcrypt.hash(contrasena, 10);
+    usuario.contrasena = contrasena; // Asignamos directamente la contraseña sin hashear
   }
 
   usuario.nombre   = nombre;
