@@ -1,4 +1,4 @@
-// backend/controllers/canchaController.js
+// controllers/canchaController.js
 const canchaService = require('../services/canchaService');
 
 exports.listarCanchas = async (req, res, next) => {
@@ -28,22 +28,24 @@ exports.obtenerCancha = async (req, res, next) => {
 
 exports.crearCancha = async (req, res, next) => {
   try {
-    // Destructuramos los campos que realmente llegan desde el frontend
+    // Destructuramos los campos que llegan desde el frontend
     const {
       nombre,
       descripcion,
       ubicacion,
       deporte,
+      estado,       // <-- nuevo campo
       empresa_id,
-      companyId  // opcional, por compatibilidad
+      companyId     // opcional, por compatibilidad
     } = req.body;
 
     const nueva = await canchaService.create({
-      nombre:       nombre,
-      descripcion:  descripcion,
-      ubicacion:    ubicacion,
-      deporte:      deporte,
-      empresa_id:   empresa_id ?? companyId
+      nombre,
+      descripcion,
+      ubicacion,
+      deporte,
+      estado: estado ?? 0,
+      empresa_id: empresa_id ?? companyId
     });
 
     res.status(201).json(nueva);
@@ -59,16 +61,18 @@ exports.actualizarCancha = async (req, res, next) => {
       descripcion,
       ubicacion,
       deporte,
+      estado,       // <-- nuevo campo
       empresa_id,
       companyId
     } = req.body;
 
     const updated = await canchaService.updateById(req.params.id, {
-      nombre:       nombre,
-      descripcion:  descripcion,
-      ubicacion:    ubicacion,
-      deporte:      deporte,
-      empresa_id:   empresa_id ?? companyId
+      nombre,
+      descripcion,
+      ubicacion,
+      deporte,
+      estado: estado ?? 0,
+      empresa_id: empresa_id ?? companyId
     });
 
     res.json(updated);
@@ -83,5 +87,24 @@ exports.eliminarCancha = async (req, res, next) => {
     res.status(204).end();
   } catch (err) {
     next(err);
+  }
+};
+
+exports.desactivarCancha = async (req, res, next) => {
+  try {
+    await canchaService.cambiarEstadoCancha(req.params.id, 0);
+    res.json({ message: 'Cancha desactivada.' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+};
+
+// PATCH /canchas/:id/activar
+exports.activarCancha = async (req, res, next) => {
+  try {
+    await canchaService.cambiarEstadoCancha(req.params.id, 1);
+    res.json({ message: 'Cancha activada.' });
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
   }
 };

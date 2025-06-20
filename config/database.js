@@ -82,7 +82,7 @@ function initializeDB() {
       );
     `);
 
-    // horarios_funcionamiento
+    // horarios_funcionamiento ahora ligado a canchas
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,7 +94,7 @@ function initializeDB() {
       );
     `);
 
-    // canchas
+    // canchas con nuevo campo estado
     db.run(`
       CREATE TABLE IF NOT EXISTS canchas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -102,6 +102,7 @@ function initializeDB() {
         descripcion TEXT,
         ubicacion VARCHAR(255),
         deporte VARCHAR(50) NOT NULL,
+        estado INTEGER NOT NULL DEFAULT 0,
         empresa_id INTEGER,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id)
       );
@@ -171,7 +172,7 @@ function initializeDB() {
       );
     `);
 
-    // tarifas_alquiler (now linked to canchas, with dia_semana + default flag)
+    // tarifas_alquiler
     db.run(`
       CREATE TABLE IF NOT EXISTS tarifas_alquiler (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,7 +186,7 @@ function initializeDB() {
       );
     `);
 
-    // ** nuevos: horarios_bloqueados **
+    // horarios_bloqueados
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_bloqueados (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

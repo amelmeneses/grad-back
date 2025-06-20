@@ -1,4 +1,3 @@
-// backend/services/canchaService.js
 const { Cancha } = require('../models/canchaModel');
 
 exports.getAll = () =>
@@ -21,3 +20,16 @@ exports.updateById = (id, data) =>
 
 exports.deleteById = (id) =>
   Cancha.destroy({ where: { id } });
+
+// ** NUEVO **: Cambiar solo el campo "estado"
+exports.cambiarEstadoCancha = async (id, nuevoEstado) => {
+  const cancha = await Cancha.findByPk(id);
+  if (!cancha) {
+    const err = new Error('Cancha no encontrada');
+    err.status = 404;
+    throw err;
+  }
+  cancha.estado = nuevoEstado;
+  await cancha.save();
+  return cancha;
+};

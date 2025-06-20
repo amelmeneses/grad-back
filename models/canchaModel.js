@@ -1,4 +1,3 @@
-// backend/models/canchaModel.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -25,6 +24,11 @@ Cancha.init({
   deporte: {
     type: DataTypes.STRING(50),
     allowNull: false,
+  },
+  estado: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0, // 0 = inactivo, 1 = activo, por ejemplo
   },
   empresa_id: {
     type: DataTypes.INTEGER,
