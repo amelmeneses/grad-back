@@ -86,11 +86,11 @@ function initializeDB() {
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        empresa_id INTEGER,
+        cancha_id INTEGER NOT NULL,
         dia_semana VARCHAR(20),
         hora_apertura TIME,
         hora_cierre TIME,
-        FOREIGN KEY (empresa_id) REFERENCES empresas(id)
+        FOREIGN KEY (cancha_id) REFERENCES canchas(id)
       );
     `);
 
