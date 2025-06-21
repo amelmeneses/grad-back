@@ -8,12 +8,12 @@ INSERT INTO empresas VALUES(4,'Emoresina','empres@gmail.com','0998746372','calif
 INSERT INTO empresas VALUES(5,'aaaaa','aaaaa@gmail.com','0992234543','kenedy',5);
 INSERT INTO empresas VALUES(6,'eeeee','eee@gmail.com','0999333222','california',5);
 INSERT INTO empresas VALUES(8,'Tristan','trista@gmail.com','0992231232','calif',6);
-INSERT INTO usuarios VALUES(1,'Amel','Meneses','amelsabine@gmail.com','$2b$10$H4GBWNMrcn4c18gMroVjNOeE/F0iMaAY9UrAVgTBlPuKgZ27RtBua',1,1,'2025-06-20 05:45:37');
-INSERT INTO usuarios VALUES(3,'Daniel','Sanchez','danielsanchez@gmail.com','$2b$10$JpA1163yk8F9aqW9trW3seai4n/hJYAhdHOWZ6TjzHGi1Sd9ja0w2',2,1,'2025-06-06 22:54:55.924 +00:00');
-INSERT INTO usuarios VALUES(4,'Ariadna','Meneses','ariadnameneses@gmail.com','$2b$10$dk3TDHNp8ugqIFwZvl4iI.pUnlc0Kf9l2PtPs34aFgM09v7REG8sy',2,1,'2025-06-06 22:55:22.658 +00:00');
-INSERT INTO usuarios VALUES(5,'Sabine','Fabara','asmenesesi@puce.edu.ec','$2b$10$wdK/XQo1DTVYJ4zU4BgsYuQLYFBI1g/DpPc0dpU1xV1PDT36LyiCa',3,1,'2025-06-06 22:56:02.521 +00:00');
-INSERT INTO usuarios VALUES(6,'jose','Sevillano','josesevillano@hotmail.com','$2b$10$smeSV8cdr4cdoZZi5cb7O.lKVKkjKBq5GEkJD3R0oqWGhZzdXvsbK',3,1,'2025-06-06 22:57:47.118 +00:00');
-INSERT INTO usuarios VALUES(7,'aña','Meneses','testo@gmail.com','$2b$10$udd/X9nd6F3K/QY4my6DCO0U70GK9xfNf2HJaJZD.dVV8bgSHbBGy',3,1,'2025-06-10 02:45:26.882 +00:00');
+INSERT INTO usuarios VALUES(1,'Amel','Meneses','amelsabine@gmail.com','$2b$10$H4GBWNMrcn4c18gMroVjNOeE/F0iMaAY9UrAVgTBlPuKgZ27RtBua',1,1,'aaf03955-14d7-4900-b221-46234042f6d1','2025-06-20 05:45:37');
+INSERT INTO usuarios VALUES(3,'Daniel','Sanchez','danielsanchez@gmail.com','$2b$10$JpA1163yk8F9aqW9trW3seai4n/hJYAhdHOWZ6TjzHGi1Sd9ja0w2',2,1,'aaf03955-14d7-4900-b221-46234042f6d2','2025-06-06 22:54:55.924 +00:00');
+INSERT INTO usuarios VALUES(4,'Ariadna','Meneses','ariadnameneses@gmail.com','$2b$10$dk3TDHNp8ugqIFwZvl4iI.pUnlc0Kf9l2PtPs34aFgM09v7REG8sy',2,1,'aaf03955-14d7-4900-b221-46234042f6d3','2025-06-06 22:55:22.658 +00:00');
+INSERT INTO usuarios VALUES(5,'Sabine','Fabara','asmenesesi@puce.edu.ec','$2b$10$wdK/XQo1DTVYJ4zU4BgsYuQLYFBI1g/DpPc0dpU1xV1PDT36LyiCa',3,1,'aaf03955-14d7-4900-b221-46234042f6d4','2025-06-06 22:56:02.521 +00:00');
+INSERT INTO usuarios VALUES(6,'jose','Sevillano','josesevillano@hotmail.com','$2b$10$smeSV8cdr4cdoZZi5cb7O.lKVKkjKBq5GEkJD3R0oqWGhZzdXvsbK',3,1,'aaf03955-14d7-4900-b221-46234042f6d5','2025-06-06 22:57:47.118 +00:00');
+INSERT INTO usuarios VALUES(7,'aña','Meneses','testo@gmail.com','$2b$10$udd/X9nd6F3K/QY4my6DCO0U70GK9xfNf2HJaJZD.dVV8bgSHbBGy',3,1,'aaf03955-14d7-4900-b221-46234042f6d6','2025-06-10 02:45:26.882 +00:00');
 INSERT INTO canchas VALUES (1,  'Fut1',    'Fut1',    'Fut1',    'futbol', 1, 1);
 INSERT INTO canchas VALUES (2,  'Fut2',    'Fut2',    'Fut2',    'futbol', 1, 1);
 INSERT INTO canchas VALUES (3,  'Tennis1', 'Tennis1', 'Tennis1', 'tenis',  1, 1);

@@ -1,7 +1,11 @@
 // backend/controllers/userController.js
 
+const { sendMail } = require('../utils/mailer');
+
 const {
   registrarNuevoUsuario,
+  registrarNuevoUsuarioAnonimo,
+  activateUserByToken,
   getAllUsuarios,
   getUsuarioById,
   updateUsuarioById,
@@ -16,6 +20,55 @@ exports.registrarUsuario = async (req, res) => {
     res.status(201).json(user);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+/**
+ * Registro de usuario anónimo:
+ * crea con estado 0 e
+ * envía link de activación por email.
+ */
+exports.registerAnonUser = async (req, res) => {
+  try {
+    const { nombre, apellido, email, password } = req.body;
+    const user = await registrarNuevoUsuarioAnonimo({ nombre, apellido, email, password });
+
+    const activationLink = `${process.env.APP_URL}/activate/${user.activation_token}`;
+    const html = `
+      <p>Hola ${user.nombre},</p>
+      <p>Pulsa este enlace para activar tu cuenta:</p>
+      <a href="${activationLink}">Activar mi cuenta</a>
+    `;
+
+    // kick off mail but don't await it
+    sendMail(user.email, 'Activa tu cuenta', html)
+      .then(previewUrl => {
+        if (previewUrl) console.log('Activation email preview:', previewUrl);
+      })
+      .catch(err => console.error('Error sending activation mail:', err));
+
+    res.status(201).json({
+      message: 'Usuario creado. Revisa tu correo para activarlo.',
+      // in dev there's no URL, but you can find it in stdout
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
+
+exports.activateAnonUser = async (req, res) => {
+  try {
+    await activateUserByToken(req.params.token);
+    // puedes redirigir a tu front o mostrar un mensaje html
+    return res.send(`
+      <h1>Cuenta activada correctamente 🎉</h1>
+      <p>Ya puedes <a href="/login">iniciar sesión</a>.</p>
+    `);
+  } catch (err) {
+    return res.status(err.status || 500).send(`
+      <h1>Error al activar cuenta</h1>
+      <p>${err.message}</p>
+    `);
   }
 };
 

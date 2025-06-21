@@ -3,6 +3,7 @@
 const express = require('express');
 const {
   registrarUsuario,
+  registerAnonUser,
   listarUsuarios,
   obtenerUsuario,
   actualizarUsuario,
@@ -15,6 +16,9 @@ const router = express.Router();
 
 // Registrar (público)
 router.post('/register', registrarUsuario);
+
+// Registrar anónimo (público)
+router.post('/register-anon-user', registerAnonUser);
 
 // Listar todos (sólo admin)
 router.get('/users', authMiddleware, isAdmin, listarUsuarios);

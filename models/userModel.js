@@ -1,4 +1,4 @@
-// models/userModel.js
+// backend/models/userModel.js
 
 const { Sequelize, DataTypes } = require("sequelize");
 const sequelize = require("../config/db");
@@ -44,6 +44,10 @@ Usuario.init(
       allowNull: false,
       defaultValue: 1, // 1 = activo, 0 = inactivo
     },
+    activation_token: {
+      type: DataTypes.STRING(255),
+      allowNull: true, // al crear anónimo generaremos uno
+    },
     fecha_creacion: {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
@@ -68,7 +72,7 @@ Usuario.beforeCreate(async (usuario) => {
 
 // Hook para hashear la contraseña en UPDATE (solo si cambia)
 Usuario.beforeUpdate(async (usuario) => {
-  if (usuario.contrasena && usuario.contrasena !== "") {
+  if (usuario.changed("contrasena")) {
     const salt = await bcrypt.genSalt(10);
     usuario.contrasena = await bcrypt.hash(usuario.contrasena, salt);
   }

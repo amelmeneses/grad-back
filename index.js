@@ -9,29 +9,30 @@ process.on('unhandledRejection', (reason) => {
 });
 
 require('dotenv').config();
-const express             = require('express');
-const cors                = require('cors');
-const bodyParser          = require('body-parser');
+const express   = require('express');
+const cors      = require('cors');
+const bodyParser = require('body-parser');
 
-// 1) Inicialización de la base SQLite (raw SQL)
-const initializeDB        = require('./config/database');
-// 2) Instancia de Sequelize para modelos
-const sequelize           = require('./config/db');
+// Sequelize + raw-SQL DB
+const initializeDB = require('./config/database');
+const sequelize    = require('./config/db');
 
-// 3) Importar rutas
-const authRoutes          = require('./routes/authRoutes');
-const userRoutes          = require('./routes/userRoutes');
-const roleRoutes          = require('./routes/roleRoutes');
-const empresaRoutes       = require('./routes/empresaRoutes');
-const facturacionRoutes   = require('./routes/facturacionRoutes');
-const canchaRoutes        = require('./routes/canchaRoutes');
-const tarifaRoutes        = require('./routes/tarifaAlquilerRoutes');
-const horarioRoutes       = require('./routes/horarioFuncionamientoRoutes');
+// Controllers
+const { activateAnonUser } = require('./controllers/userController');
 
+// Routers
+const authRoutes        = require('./routes/authRoutes');
+const userRoutes        = require('./routes/userRoutes');
+const roleRoutes        = require('./routes/roleRoutes');
+const empresaRoutes     = require('./routes/empresaRoutes');
+const facturacionRoutes = require('./routes/facturacionRoutes');
+const canchaRoutes      = require('./routes/canchaRoutes');
+const tarifaRoutes      = require('./routes/tarifaAlquilerRoutes');
+const horarioRoutes     = require('./routes/horarioFuncionamientoRoutes');
 
 const app = express();
 
-// Inicializar/crear tablas en SQLite (estructura + datos semilla)
+// 1) Inicializar/crear tablas en SQLite (estructura + datos semilla)
 initializeDB();
 
 // Middleware
@@ -39,7 +40,10 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Montar todas las rutas bajo el prefijo /api
+// 1) Public activation endpoint (no auth)
+app.get('/activate/:token', activateAnonUser);
+
+// 2) Mount all /api routes
 app.use('/api', authRoutes);
 app.use('/api', userRoutes);
 app.use('/api', roleRoutes);
@@ -49,13 +53,13 @@ app.use('/api', canchaRoutes);
 app.use('/api', tarifaRoutes);
 app.use('/api', horarioRoutes);
 
-// Manejador de errores global
+// Global error handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ message: err.message });
 });
 
-// Sincronizar modelos de Sequelize sin forzar DROP de tablas
+// Sync Sequelize (no drops) and start server
 sequelize.sync({ force: false }).then(() => {
   console.log('Database synchronized');
   const PORT = process.env.PORT || 5001;

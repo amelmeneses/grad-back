@@ -40,7 +40,7 @@ function initializeDB() {
       );
     `);
 
-    // usuarios
+    // usuarios (ahora con activation_token)
     db.run(`
       CREATE TABLE IF NOT EXISTS usuarios (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +50,7 @@ function initializeDB() {
         contrasena VARCHAR(255),
         rol_id INTEGER,
         estado INTEGER DEFAULT 1,
+        activation_token VARCHAR(255),  -- nuevo campo para registro anónimo
         fecha_creacion TIMESTAMP,
         FOREIGN KEY (rol_id) REFERENCES roles(id)
       );
@@ -82,7 +83,7 @@ function initializeDB() {
       );
     `);
 
-    // horarios_funcionamiento ahora ligado a canchas
+    // horarios_funcionamiento
     db.run(`
       CREATE TABLE IF NOT EXISTS horarios_funcionamiento (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -219,9 +220,9 @@ function initializeDB() {
       if (!errHash) {
         db.run(
           `INSERT INTO usuarios 
-             (nombre, apellido, email, contrasena, rol_id, estado, fecha_creacion)
+             (nombre, apellido, email, contrasena, rol_id, estado, activation_token, fecha_creacion)
            VALUES 
-             ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, 1, CURRENT_TIMESTAMP)`,
+             ('Amel', 'Meneses', 'amelsabine@gmail.com', ?, 1, 1, NULL, CURRENT_TIMESTAMP)`,
           [hashed]
         );
       }
