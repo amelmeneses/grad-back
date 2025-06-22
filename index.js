@@ -41,7 +41,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // 1) Public activation endpoint (no auth)
-app.get('/activate/:token', activateAnonUser);
+app.get('/api/activate/:token', activateAnonUser);
 
 // 2) Mount all /api routes
 app.use('/api', authRoutes);

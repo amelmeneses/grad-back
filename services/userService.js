@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { Usuario } = require('../models/userModel');
 const { Role }    = require('../models/roleModel');
 const { Empresa } = require('../models/empresaModel');
-const { sendMail } = require('../utils/mailer');
+// const { sendMail } = require('../utils/mailer');
 const { v4: uuidv4 } = require('uuid');
 
 // Función para registrar un nuevo usuario
@@ -29,31 +29,32 @@ exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_
  * envía un correo de activación con token.
  */
 exports.registrarNuevoUsuarioAnonimo = async ({ nombre, apellido, email, password }) => {
+  console.log('registrarNuevoUsuarioAnonimo userService Usuario anónimo:', email);
   const exists = await Usuario.findOne({ where: { email } });
   if (exists) {
     const err = new Error('El correo electrónico ya está registrado.');
     err.status = 400;
     throw err;
   }
-  const hashed = await bcrypt.hash(password, 10);
+  // const hashed = await bcrypt.hash(password, 10);
   const activationToken = uuidv4();
   const usuario = await Usuario.create({
     nombre,
     apellido,
     email,
-    contrasena: hashed,
-    rol_id: 3,       // rol "empresa" o "usuario" por defecto
+    contrasena: password,
+    rol_id: 2,       // rol "empresa" o "usuario" por defecto
     estado: 0,       // inactivo hasta activar
     activation_token: activationToken, // asumimos campo en modelo
   });
 
-  // Enviar email de activación
-  const link = `${process.env.APP_URL}/activate/${activationToken}`;
-  await sendMail(
-    email,
-    'Activa tu cuenta',
-    `Hola ${nombre},\n\nPara activar tu cuenta haz click aquí:\n\n${link}\n\nGracias.`
-  );
+  // // Enviar email de activación
+  // const link = `${process.env.APP_URL}/activate/${activationToken}`;
+  // await sendMail(
+  //   email,
+  //   'Activa tu cuenta',
+  //   `Hola ${nombre},\n\nPara activar tu cuenta haz click aquí:\n\n${link}\n\nGracias.`
+  // );
   return usuario;
 };
 

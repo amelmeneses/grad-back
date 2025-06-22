@@ -32,13 +32,11 @@ exports.registerAnonUser = async (req, res) => {
   try {
     const { nombre, apellido, email, password } = req.body;
     const user = await registrarNuevoUsuarioAnonimo({ nombre, apellido, email, password });
+    console.log('registerAnonUser userController Usuario anónimo registrado:', user.email);
 
-    const activationLink = `${process.env.APP_URL}/activate/${user.activation_token}`;
-    const html = `
-      <p>Hola ${user.nombre},</p>
-      <p>Pulsa este enlace para activar tu cuenta:</p>
-      <a href="${activationLink}">Activar mi cuenta</a>
-    `;
+    const activationLink = `${process.env.APP_URL}/activate/user/${user.activation_token}`;
+    // build as one‐liner so Nodemailer won't insert soft line-breaks
+    const html = `<p>Hola ${user.nombre},</p><p>Pulsa este enlace para activar tu cuenta:</p><p><a href="${activationLink}">Activar mi cuenta</a></p>`;
 
     // kick off mail but don't await it
     sendMail(user.email, 'Activa tu cuenta', html)
@@ -49,7 +47,6 @@ exports.registerAnonUser = async (req, res) => {
 
     res.status(201).json({
       message: 'Usuario creado. Revisa tu correo para activarlo.',
-      // in dev there's no URL, but you can find it in stdout
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -58,17 +55,18 @@ exports.registerAnonUser = async (req, res) => {
 
 exports.activateAnonUser = async (req, res) => {
   try {
+    console.log("iniciando activación de cuenta con token:", req.params.token);
     await activateUserByToken(req.params.token);
-    // puedes redirigir a tu front o mostrar un mensaje html
-    return res.send(`
-      <h1>Cuenta activada correctamente 🎉</h1>
-      <p>Ya puedes <a href="/login">iniciar sesión</a>.</p>
-    `);
+    // Success → JSON response
+    console.log('Cuenta activada correctamente.');
+    return res.status(200).json({
+      message: 'Cuenta activada correctamente. Puedes iniciar sesión.'
+    });
   } catch (err) {
-    return res.status(err.status || 500).send(`
-      <h1>Error al activar cuenta</h1>
-      <p>${err.message}</p>
-    `);
+    // Error → JSON response with the right HTTP status
+    return res.status(err.status || 500).json({
+      message: err.message || 'Error al activar cuenta'
+    });
   }
 };
 
