@@ -25,37 +25,52 @@ exports.registrarNuevoUsuario = async ({ nombre, apellido, email, password, rol_
 };
 
 /**
- * Crea un usuario anónimo con estado = 0 e
- * envía un correo de activación con token.
+ * Crea un usuario anónimo (o empresa) con estado = 0 e
+ * opcionalmente crea su empresa asociada.
+ *
+ * @param {object} opts
+ * @param {string} opts.nombre
+ * @param {string} opts.apellido
+ * @param {string} opts.email
+ * @param {string} opts.password
+ * @param {number} [opts.rol_id]    // si viene, lo usamos; si no, 2 = usuario
+ * @param {object} [opts.empresa]   // si viene, objeto con { nombre, contacto_email, contacto_telefono, direccion }
  */
-exports.registrarNuevoUsuarioAnonimo = async ({ nombre, apellido, email, password }) => {
-  console.log('registrarNuevoUsuarioAnonimo userService Usuario anónimo:', email);
+exports.registrarNuevoUsuarioAnonimo = async ({
+  nombre,
+  apellido,
+  email,
+  password,
+  rol_id,
+  empresa
+}) => {
   const exists = await Usuario.findOne({ where: { email } });
   if (exists) {
     const err = new Error('El correo electrónico ya está registrado.');
     err.status = 400;
     throw err;
   }
-  // const hashed = await bcrypt.hash(password, 10);
+
   const activationToken = uuidv4();
-  const usuario = await Usuario.create({
+  const user = await Usuario.create({
     nombre,
     apellido,
     email,
     contrasena: password,
-    rol_id: 2,       // rol "empresa" o "usuario" por defecto
-    estado: 0,       // inactivo hasta activar
-    activation_token: activationToken, // asumimos campo en modelo
+    rol_id: rol_id ?? 2,     // default to 2 (“usuario”) but we'll override in controller if needed
+    estado: 0,               // inactivo hasta activar
+    activation_token: activationToken,
   });
 
-  // // Enviar email de activación
-  // const link = `${process.env.APP_URL}/activate/${activationToken}`;
-  // await sendMail(
-  //   email,
-  //   'Activa tu cuenta',
-  //   `Hola ${nombre},\n\nPara activar tu cuenta haz click aquí:\n\n${link}\n\nGracias.`
-  // );
-  return usuario;
+  // If the frontend passed an `empresa` object, create it now.
+  if (empresa) {
+    await Empresa.create({
+      ...empresa,
+      usuario_id: user.id
+    });
+  }
+
+  return user;
 };
 
 exports.activateUserByToken = async (token) => {

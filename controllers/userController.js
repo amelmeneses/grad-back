@@ -23,33 +23,35 @@ exports.registrarUsuario = async (req, res) => {
   }
 };
 
-/**
- * Registro de usuario anónimo:
- * crea con estado 0 e
- * envía link de activación por email.
- */
 exports.registerAnonUser = async (req, res) => {
   try {
-    const { nombre, apellido, email, password } = req.body;
-    const user = await registrarNuevoUsuarioAnonimo({ nombre, apellido, email, password });
-    console.log('registerAnonUser userController Usuario anónimo registrado:', user.email);
+    // now also read rol_id and empresa from the body
+    const { nombre, apellido, email, password, rol_id, empresa } = req.body;
+
+    // if they checked “empresa”, force rol_id = 3
+    const user = await registrarNuevoUsuarioAnonimo({
+      nombre,
+      apellido,
+      email,
+      password,
+      rol_id: rol_id === 3 ? 3 : undefined,
+      empresa
+    });
+
+    console.log('registerAnonUser: created user', user.email);
 
     const activationLink = `${process.env.APP_URL}/activate/user/${user.activation_token}`;
-    // build as one‐liner so Nodemailer won't insert soft line-breaks
-    const html = `<p>Hola ${user.nombre},</p><p>Pulsa este enlace para activar tu cuenta:</p><p><a href="${activationLink}">Activar mi cuenta</a></p>`;
+    const html = `<p>Hola ${user.nombre},</p>` +
+                 `<p>Pulsa este enlace para activar tu cuenta:</p>` +
+                 `<p><a href="${activationLink}">Activar mi cuenta</a></p>`;
 
-    // kick off mail but don't await it
     sendMail(user.email, 'Activa tu cuenta', html)
-      .then(previewUrl => {
-        if (previewUrl) console.log('Activation email preview:', previewUrl);
-      })
-      .catch(err => console.error('Error sending activation mail:', err));
+      .then(url => url && console.log('Activation mail preview:', url))
+      .catch(console.error);
 
-    res.status(201).json({
-      message: 'Usuario creado. Revisa tu correo para activarlo.',
-    });
+    res.status(201).json({ message: 'Usuario creado. Revisa tu correo para activarlo.' });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(err.status || 400).json({ message: err.message });
   }
 };
 
