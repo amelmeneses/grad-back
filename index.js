@@ -37,8 +37,8 @@ initializeDB();
 
 // Middleware
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '5mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '5mb' }));
 
 // 1) Public activation endpoint (no auth)
 app.get('/api/activate/:token', activateAnonUser);

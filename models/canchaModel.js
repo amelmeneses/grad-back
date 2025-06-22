@@ -30,6 +30,10 @@ Cancha.init({
     allowNull: false,
     defaultValue: 0, // 0 = inactivo, 1 = activo, por ejemplo
   },
+  imagen_principal: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   empresa_id: {
     type: DataTypes.INTEGER,
     allowNull: false,

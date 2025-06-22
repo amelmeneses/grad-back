@@ -35,6 +35,7 @@ exports.crearCancha = async (req, res, next) => {
       ubicacion,
       deporte,
       estado,       // <-- nuevo campo
+      imagen_principal,
       empresa_id,
       companyId     // opcional, por compatibilidad
     } = req.body;
@@ -45,6 +46,7 @@ exports.crearCancha = async (req, res, next) => {
       ubicacion,
       deporte,
       estado: estado ?? 0,
+      imagen_principal,
       empresa_id: empresa_id ?? companyId
     });
 
@@ -62,6 +64,7 @@ exports.actualizarCancha = async (req, res, next) => {
       ubicacion,
       deporte,
       estado,       // <-- nuevo campo
+      imagen_principal,
       empresa_id,
       companyId
     } = req.body;
@@ -72,6 +75,7 @@ exports.actualizarCancha = async (req, res, next) => {
       ubicacion,
       deporte,
       estado: estado ?? 0,
+      imagen_principal,
       empresa_id: empresa_id ?? companyId
     });
 

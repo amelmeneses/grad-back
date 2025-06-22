@@ -104,6 +104,7 @@ function initializeDB() {
         ubicacion VARCHAR(255),
         deporte VARCHAR(50) NOT NULL,
         estado INTEGER NOT NULL DEFAULT 0,
+        imagen_principal TEXT NOT NULL,
         empresa_id INTEGER,
         FOREIGN KEY (empresa_id) REFERENCES empresas(id)
       );
