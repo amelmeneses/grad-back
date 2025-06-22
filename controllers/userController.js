@@ -13,6 +13,37 @@ const {
   cambiarEstadoUsuario
 } = require('../services/userService');
 
+exports.getOwnProfile = async (req, res) => {
+  try {
+    const usuario = await getUsuarioById(req.user.id);
+    res.json(usuario);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+};
+
+exports.updateOwnProfile = async (req, res) => {
+  try {
+    const { nombre, apellido, email, contrasena } = req.body;
+    // Leemos el usuario actual para obtener rol_id y estado
+    const usuarioActual = await getUsuarioById(req.user.id);
+    const updated = await updateUsuarioById(
+      req.user.id,
+      {
+        nombre,
+        apellido,
+        email,
+        contrasena,            // si es undefined, el servicio no lo toca
+        rol_id: usuarioActual.rol_id,
+        estado: usuarioActual.estado
+      }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(err.status || 500).json({ message: err.message });
+  }
+};
+
 exports.registrarUsuario = async (req, res) => {
   try {
     const { nombre, apellido, email, password, rol_id, estado } = req.body;
