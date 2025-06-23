@@ -112,3 +112,16 @@ exports.activarCancha = async (req, res, next) => {
     res.status(err.status || 500).json({ message: err.message });
   }
 };
+
+exports.canchasPorDeporte = async (req, res, next) => {
+  try {
+    const { deporte } = req.query;
+    if (!deporte) {
+      return res.status(400).json({ message: 'Parámetro \"deporte\" es requerido' });
+    }
+    const canchas = await canchaService.getActivasPorDeporte(deporte);
+    res.json(canchas);
+  } catch (err) {
+    next(err);
+  }
+};

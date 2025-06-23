@@ -1,3 +1,4 @@
+//services/canchaService.js
 const { Cancha } = require('../models/canchaModel');
 
 exports.getAll = () =>
@@ -33,3 +34,7 @@ exports.cambiarEstadoCancha = async (id, nuevoEstado) => {
   await cancha.save();
   return cancha;
 };
+
+//canchas activas por deporte
+exports.getActivasPorDeporte = (deporte) =>
+  Cancha.findAll({ where: { deporte, estado: 1 } });
