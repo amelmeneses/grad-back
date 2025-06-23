@@ -17,7 +17,7 @@ exports.authMiddleware = (req, res, next) => {
 
 // Middleware para verificar si el usuario es admin
 exports.isAdmin = (req, res, next) => {
-  if (req.user.role !== 1) { // Suponiendo que el rol 1 es Admin
+  if (req.user.role !== 1 && req.user.role !== 3) { // Suponiendo que el rol 1 es Admin
     return res.status(403).send({ message: 'Access denied. Admins only.' });
   }
   next();
