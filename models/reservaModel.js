@@ -52,7 +52,7 @@ Reserva.init({
 
 // *Asociación inversa* a Usuario y Cancha
 setImmediate(() => {
-  const { Usuario } = require('./usuarioModel');
+  const { Usuario } = require('./userModel');
   const { Cancha } = require('./canchaModel');
 
   Reserva.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
