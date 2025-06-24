@@ -1,5 +1,6 @@
 //services/canchaService.js
 const { Cancha } = require('../models/canchaModel');
+const { TarifaAlquiler } = require('../models/tarifaAlquilerModel');
 
 exports.getAll = () =>
   Cancha.findAll();
@@ -35,6 +36,15 @@ exports.cambiarEstadoCancha = async (id, nuevoEstado) => {
   return cancha;
 };
 
-//canchas activas por deporte
 exports.getActivasPorDeporte = (deporte) =>
-  Cancha.findAll({ where: { deporte, estado: 1 } });
+  Cancha.findAll({
+    where: { deporte, estado: 1 },
+    include: [
+      {
+        model: TarifaAlquiler,
+        as: 'tarifas',
+        where: { default: 1 },
+        required: false // para que incluya aunque no tenga tarifa default
+      }
+    ]
+  });
