@@ -29,6 +29,8 @@ const facturacionRoutes = require('./routes/facturacionRoutes');
 const canchaRoutes      = require('./routes/canchaRoutes');
 const tarifaRoutes      = require('./routes/tarifaAlquilerRoutes');
 const horarioRoutes     = require('./routes/horarioFuncionamientoRoutes');
+const reservaRoutes     = require('./routes/reservaRoutes');
+
 
 const app = express();
 
@@ -52,6 +54,7 @@ app.use('/api', facturacionRoutes);
 app.use('/api', canchaRoutes);
 app.use('/api', tarifaRoutes);
 app.use('/api', horarioRoutes);
+app.use('/api', reservaRoutes);
 
 // Global error handler
 app.use((err, req, res, next) => {
