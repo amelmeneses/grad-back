@@ -32,4 +32,13 @@ router.delete('/canchas/:id',      authMiddleware, isAdmin, eliminarCancha);
 router.patch('/canchas/:id/desactivar', authMiddleware, isAdmin, desactivarCancha);
 router.patch('/canchas/:id/activar',    authMiddleware, isAdmin, activarCancha);
 
+
+// Nueva ruta para obtener detalles de cancha para usuarios clientes
+router.get('/reservas-cancha/:id', authMiddleware, (req, res, next) => {
+  if (req.user.role !== 2) {
+    return res.status(403).json({ message: 'Acceso restringido a usuarios.' });
+  }
+  return require('../controllers/canchaController').obtenerCanchaParaReserva(req, res, next);
+});
+
 module.exports = router;

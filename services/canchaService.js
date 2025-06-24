@@ -48,3 +48,15 @@ exports.getActivasPorDeporte = (deporte) =>
       }
     ]
   });
+
+  exports.getCanchaParaReserva = (id) =>
+  Cancha.findByPk(id, {
+    include: [
+      {
+        model: TarifaAlquiler,
+        as: 'tarifas',
+        where: { default: 1 },
+        required: false
+      }
+    ]
+  });

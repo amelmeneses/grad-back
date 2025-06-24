@@ -125,3 +125,15 @@ exports.canchasPorDeporte = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.obtenerCanchaParaReserva = async (req, res, next) => {
+  try {
+    const cancha = await canchaService.getCanchaParaReserva(req.params.id);
+    if (!cancha) {
+      return res.status(404).json({ message: 'Cancha no encontrada' });
+    }
+    res.json(cancha);
+  } catch (err) {
+    next(err);
+  }
+};
