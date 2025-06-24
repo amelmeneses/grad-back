@@ -1,4 +1,4 @@
-// controllers/canchaController.js
+// models/canchaModel.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 

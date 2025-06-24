@@ -141,7 +141,7 @@ function initializeDB() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         usuario_id INTEGER,
         cancha_id INTEGER,
-        fecha TIMESTAMP,
+        fecha DATE,
         hora_inicio TIME,
         hora_fin TIME,
         estado VARCHAR(50),
