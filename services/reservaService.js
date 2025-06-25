@@ -48,7 +48,7 @@ exports.obtenerPorEmpresasUsuario = async usuarioId => {
 // Marcar reserva como cancelada
 exports.cancelarReserva = async id => {
   const [updatedCount] = await Reserva.update(
-    { estado: 'cancelada' },
+    { estado: 'canceled' },
     { where: { id } }
   );
   return updatedCount;
