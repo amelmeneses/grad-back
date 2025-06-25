@@ -8,7 +8,8 @@
     "db:seed": "node ./config/database.js",
     "db:export": "node scripts/exportSeed.js",
     "db:export:data": "node scripts/exportSeed.js --data-only",
-    "db:import": "node scripts/importSeed.js"
+    "db:import": "node scripts/importSeed.js",
+    "cancel-expired": "node tasks/cancelExpired.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +23,7 @@
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "node-cron": "^4.1.1",
     "nodemailer": "^7.0.3",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",

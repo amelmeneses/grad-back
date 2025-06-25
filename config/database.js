@@ -145,10 +145,13 @@ function initializeDB() {
         hora_inicio TIME,
         hora_fin TIME,
         estado VARCHAR(50),
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
         FOREIGN KEY (cancha_id) REFERENCES canchas(id)
       );
     `);
+
 
     // reserva_servicios
     db.run(`

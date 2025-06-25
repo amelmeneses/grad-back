@@ -7,11 +7,20 @@ const { Usuario }     = require('../models/userModel');
  */
 exports.crear = async (req, res, next) => {
   try {
-    const nueva = await reservaService.crearReserva({
-      ...req.body,
-      usuario_id: req.user.id
+    const { bloques, cancha_id, fecha } = req.body;
+    if (!bloques || !cancha_id || !fecha) {
+      return res.status(400).json({ message: 'Faltan datos requeridos' });
+    }
+
+    const nuevas = await reservaService.crearReserva({
+      bloques,
+      cancha_id,
+      fecha,
+      usuario_id: req.user.id,
+      estado: 'pending'
     });
-    res.status(201).json(nueva);
+
+    res.status(201).json(nuevas);
   } catch (err) {
     next(err);
   }

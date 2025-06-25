@@ -32,6 +32,7 @@ const horarioRoutes     = require('./routes/horarioFuncionamientoRoutes');
 const reservaRoutes     = require('./routes/reservaRoutes');
 
 const app = express();
+const { iniciarCancelacionAutomatica } = require('./jobs/cronCancelaciones');
 
 // Middleware
 app.use(cors());
@@ -51,6 +52,9 @@ app.use('/api', canchaRoutes);
 app.use('/api', tarifaRoutes);
 app.use('/api', horarioRoutes);
 app.use('/api', reservaRoutes);
+
+// Iniciar CRON
+iniciarCancelacionAutomatica();
 
 // Global error handler
 app.use((err, req, res, next) => {

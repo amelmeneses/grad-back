@@ -47,7 +47,7 @@ Reserva.init({
   sequelize,
   modelName: 'Reserva',
   tableName: 'reservas',
-  timestamps: false,
+  timestamps: true, // para manejar createdAt y updatedAt
 });
 
 // *Asociación inversa* a Usuario y Cancha
