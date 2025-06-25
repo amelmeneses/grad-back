@@ -137,3 +137,13 @@ exports.obtenerCanchaParaReserva = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.obtenerDisponibilidad = async (req, res, next) => {
+  try {
+    const canchaId = req.params.id;
+    const disponibilidad = await canchaService.getDisponibilidad(canchaId);
+    res.json(disponibilidad);
+  } catch (err) {
+    next(err);
+  }
+};
