@@ -147,3 +147,13 @@ exports.obtenerDisponibilidad = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.obtenerDisponibilidadPorFecha = async (req, res, next) => {
+  try {
+    const { id, date } = req.params;
+    const data = await canchaService.getDisponibilidadByDate(id, date);
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+};

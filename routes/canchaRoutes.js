@@ -10,7 +10,8 @@ const {
   desactivarCancha,   // <-- importamos los nuevos
   activarCancha,
   canchasPorDeporte,
-  obtenerDisponibilidad
+  obtenerDisponibilidad,
+  obtenerDisponibilidadPorFecha
 } = require('../controllers/canchaController');
 const { authMiddleware, isAdmin } = require('../middlewares/authMiddleware');
 
@@ -35,6 +36,9 @@ router.patch('/canchas/:id/activar',    authMiddleware, isAdmin, activarCancha);
 
 // Reservas disponibilidad
 router.get('/canchas/:id/disponibilidad', authMiddleware, obtenerDisponibilidad);
+
+// Reservas disponibilidad por fecha
+router.get('/canchas/:id/disponibilidad/:date', authMiddleware, obtenerDisponibilidadPorFecha);
 
 // Nueva ruta para obtener detalles de cancha para usuarios clientes
 router.get('/reservas-cancha/:id', authMiddleware, (req, res, next) => {
