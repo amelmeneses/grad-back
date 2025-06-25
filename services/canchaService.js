@@ -56,7 +56,7 @@ exports.getActivasPorDeporte = (deporte) =>
       {
         model: TarifaAlquiler,
         as: 'tarifas',
-        where: { default: 1 },
+        where: { es_default: 1 },
         required: false,
       },
     ],
@@ -68,7 +68,7 @@ exports.getCanchaParaReserva = (id) =>
       {
         model: TarifaAlquiler,
         as: 'tarifas',
-        where: { default: 1 },
+        where: { es_default: 1 },
         required: false,
       },
     ],

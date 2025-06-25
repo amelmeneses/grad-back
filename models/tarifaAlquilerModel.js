@@ -22,7 +22,7 @@ TarifaAlquiler.init({
     type: DataTypes.STRING(20),
     allowNull: true,
   },
-  default: {
+  es_default: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,

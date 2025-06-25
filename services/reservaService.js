@@ -111,3 +111,52 @@ exports.cancelarReservasExpiradas = async () => {
 
   return cantidad;
 };
+
+exports.calcularTotalPago = async (canchaId, reservasIdsArray) => {
+  const { Reserva } = require('../models/reservaModel');
+  const { Cancha } = require('../models/canchaModel');
+
+  const reservas = await Reserva.findAll({
+    where: {
+      id: reservasIdsArray,
+      cancha_id: canchaId
+    }
+  });
+
+  const cancha = await Cancha.findByPk(canchaId, {
+    include: ['tarifas']
+  });
+  console.log("CANCHA", cancha);
+
+  const tarifa = cancha?.tarifas?.find(t => t.es_default);
+  if (!tarifa) throw new Error('Tarifa por defecto no encontrada');
+
+  let totalHoras = 0;
+  for (const r of reservas) {
+    const hIni = new Date(`1970-01-01T${r.hora_inicio}`);
+    const hFin = new Date(`1970-01-01T${r.hora_fin}`);
+    const horas = (hFin - hIni) / (1000 * 60 * 60);
+    totalHoras += horas;
+  }
+
+  const total = +(totalHoras * tarifa.tarifa).toFixed(2);
+  const subtotal = +(total / 1.15).toFixed(2);
+  const iva = +(total - subtotal).toFixed(2);
+
+  return {
+    total,
+    subtotal,
+    iva,
+    reservas: reservas.map(r => ({
+      id: r.id,
+      hora_inicio: r.hora_inicio,
+      hora_fin: r.hora_fin
+    }))
+  };
+};
+
+exports.actualizarReservasPagadas = async (ids) => {
+  await Reserva.update({ estado: 'paid' }, { where: { id: ids } });
+  const reservas = await Reserva.findAll({ where: { id: ids } });
+  return reservas;
+};

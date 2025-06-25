@@ -5,7 +5,9 @@ const {
   crear,
   misReservas,
   listarReservas,
-  cancelar
+  cancelar,
+  obtenerTotalPago,
+  marcarReservasComoPagadas
 } = require('../controllers/reservaController');
 const { authMiddleware } = require('../middlewares/authMiddleware');
 
@@ -20,5 +22,9 @@ router.get('/reservas', authMiddleware, listarReservas);
 
 // Cancelar reserva
 router.patch('/reservas/:id/cancel', authMiddleware, cancelar);
+
+router.get('/reservas/:canchaId/pago', authMiddleware, obtenerTotalPago);
+
+router.put('/reservas/pago_realizado', authMiddleware, marcarReservasComoPagadas);
 
 module.exports = router;

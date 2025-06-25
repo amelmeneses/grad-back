@@ -183,7 +183,7 @@ function initializeDB() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         cancha_id INTEGER NOT NULL,
         dia_semana VARCHAR(20),
-        "default" INTEGER NOT NULL DEFAULT 0,
+        "es_default" INTEGER NOT NULL DEFAULT 0,
         hora_inicio TIME NOT NULL,
         hora_fin TIME NOT NULL,
         tarifa DECIMAL(10,2) NOT NULL,

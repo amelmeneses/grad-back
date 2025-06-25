@@ -26,15 +26,15 @@ exports.createTarifa = async (data, canchaId) => {
     where: { cancha_id: canchaId }
   });
 
-  // 2) Si es la primera, forzamos default=true
+  // 2) Si es la primera, forzamos es_default=true
   const isFirst = existingCount === 0;
-  const shouldBeDefault = isFirst || Boolean(data.default);
+  const shouldBeDefault = isFirst || Boolean(data.es_default);
 
-  // 3) Si cliente pidió default=true en no primera, desmarcamos las demás
+  // 3) Si cliente pidió es_default=true en no primera, desmarcamos las demás
   if (!isFirst && shouldBeDefault) {
     await TarifaAlquiler.update(
-      { default: false },
-      { where: { cancha_id: canchaId, default: true } }
+      { es_default: false },
+      { where: { cancha_id: canchaId, es_default: true } }
     );
   }
 
@@ -48,15 +48,17 @@ exports.createTarifa = async (data, canchaId) => {
 };
 
 exports.updateTarifaById = async (canchaId, id, data) => {
-  // Si quiere marcar default=true al editar, desmarcamos otras
-  if (data.default) {
+  // Si quiere marcar es_default=true al editar, desmarcamos otras
+  console.log("DATA", data, "para cancha ID:", canchaId);
+  console.log(data.es_default, "para cancha ID:", canchaId);
+  if (data.es_default) {
     await TarifaAlquiler.update(
-      { default: false },
+      { es_default: false },
       {
         where: {
           cancha_id: canchaId,
           id: { [Op.ne]: id },
-          default: true
+          es_default: true
         }
       }
     );
@@ -70,7 +72,7 @@ exports.deleteTarifaById = async (canchaId, id) => {
   await tarifa.destroy();
 
   // Si esa era la única marcada default y quedan tarifas, marcamos la primera como default
-  if (tarifa.default) {
+  if (tarifa.es_default) {
     const next = await TarifaAlquiler.findOne({
       where: { cancha_id: canchaId },
       order: [['id', 'ASC']]

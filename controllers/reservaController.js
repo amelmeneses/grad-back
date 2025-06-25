@@ -74,3 +74,37 @@ exports.cancelar = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.obtenerTotalPago = async (req, res) => {
+  const { canchaId } = req.params;
+  const { ids } = req.query;
+
+  if (!ids) {
+    return res.status(400).json({ message: 'IDs de reservas no proporcionados' });
+  }
+
+  try {
+    const idsArray = ids.split(',').map(Number);
+    const resultado = await reservaService.calcularTotalPago(canchaId, idsArray);
+    res.json(resultado);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: err.message || 'Error calculando total de pago' });
+  }
+};
+
+exports.marcarReservasComoPagadas = async (req, res) => {
+  const { ReservasIds } = req.query;
+  if (!ReservasIds) {
+    return res.status(400).json({ message: 'No se proporcionaron IDs' });
+  }
+
+  try {
+    const ids = ReservasIds.split(',').map(Number);
+    const reservasActualizadas = await reservaService.actualizarReservasPagadas(ids);
+    res.json(reservasActualizadas);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error actualizando estado de reservas' });
+  }
+};
