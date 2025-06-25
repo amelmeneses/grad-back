@@ -90,7 +90,6 @@ exports.getDisponibilidad = async (canchaId) => {
     raw: true
   });
 
-  // Asegurarse que fechas tipo string ISO las tratemos correctamente
   reservas.forEach(r => {
     r.fecha = parseISO(r.fecha);
   });
@@ -117,37 +116,34 @@ exports.getDisponibilidad = async (canchaId) => {
       (h) => diasSemana[h.dia_semana.toLowerCase()] === diaSemana
     );
 
-    console.log(`\nFecha ${fechaStr} (${Object.keys(diasSemana).find(k => diasSemana[k] === diaSemana)})`);
-    console.log('Ventanas:', ventanas);
-
     if (ventanas.length === 0) {
       disponibilidad[yyyyMM].no_disponibles.push(fechaStr);
-      console.log('No hay horarios definidos, marcado como no disponible');
       continue;
     }
 
     const reservasEnFecha = reservas.filter(
       (r) => format(r.fecha, 'yyyy-MM-dd') === fechaStr
     );
-    console.log("fechaStr:", fechaStr);
-    console.log("reservas[0].fecha:", reservas[0] ? reservas[0].fecha : 'No hay reservas');
-    console.log("reservaFEchaformatted:", format(new Date(reservas[0].fecha), 'yyyy-MM-dd'));
-    console.log('Reservas en fecha:', reservasEnFecha);
 
-    const ventanasReservadas = ventanas.filter((ventana) =>
-      reservasEnFecha.some(
-        (r) => r.hora_inicio === ventana.hora_apertura && r.hora_fin === ventana.hora_cierre
-      )
-    );
+    let totalMinutosFuncionamiento = 0;
+    let totalMinutosReservados = 0;
 
-    console.log('Ventanas reservadas:', ventanasReservadas);
+    ventanas.forEach((ventana) => {
+      const [hInicio, mInicio] = ventana.hora_apertura.split(':').map(Number);
+      const [hFin, mFin] = ventana.hora_cierre.split(':').map(Number);
+      totalMinutosFuncionamiento += (hFin * 60 + mFin) - (hInicio * 60 + mInicio);
+    });
 
-    if (ventanasReservadas.length === ventanas.length) {
+    reservasEnFecha.forEach((r) => {
+      const [hInicio, mInicio] = r.hora_inicio.split(':').map(Number);
+      const [hFin, mFin] = r.hora_fin.split(':').map(Number);
+      totalMinutosReservados += (hFin * 60 + mFin) - (hInicio * 60 + mInicio);
+    });
+
+    if (totalMinutosReservados >= totalMinutosFuncionamiento) {
       disponibilidad[yyyyMM].no_disponibles.push(fechaStr);
-      console.log('Todas las ventanas reservadas, marcado como no disponible');
     } else {
       disponibilidad[yyyyMM].disponibles.push(fechaStr);
-      console.log('Al menos una ventana libre, marcado como disponible');
     }
   }
 
