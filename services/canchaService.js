@@ -8,8 +8,9 @@ const {
   eachDayOfInterval,
   format,
   startOfDay,
-  addMonths,
-  parseISO
+  parseISO,
+  endOfMonth,
+  addMonths
 } = require('date-fns');
 
 // Helper para convertir nombre de día en inglés a número ISO (0 = domingo, 6 = sábado)
@@ -87,7 +88,7 @@ exports.getDisponibilidad = async (canchaId) => {
       cancha_id: canchaId,
       estado: { [Op.in]: ['pending', 'paid'] },
     },
-    raw: true
+    raw: true,
   });
 
   reservas.forEach(r => {
@@ -95,7 +96,7 @@ exports.getDisponibilidad = async (canchaId) => {
   });
 
   const hoy = startOfDay(new Date());
-  const fin = addMonths(hoy, 1);
+  const fin = endOfMonth(addMonths(hoy, 1));
   const dias = eachDayOfInterval({ start: hoy, end: fin });
 
   const disponibilidad = {};
