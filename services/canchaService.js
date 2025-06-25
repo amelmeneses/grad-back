@@ -13,7 +13,6 @@ const {
   addMonths
 } = require('date-fns');
 
-// Helper para convertir nombre de día en inglés a número ISO (0 = domingo, 6 = sábado)
 const diasSemana = {
   'sunday': 0,
   'monday': 1,
@@ -100,7 +99,6 @@ exports.getDisponibilidad = async (canchaId) => {
   const dias = eachDayOfInterval({ start: hoy, end: fin });
 
   const disponibilidad = {};
-
   for (const dia of dias) {
     const yyyyMM = format(dia, 'yyyy-MM');
     const fechaStr = format(dia, 'yyyy-MM-dd');
@@ -126,25 +124,43 @@ exports.getDisponibilidad = async (canchaId) => {
       (r) => format(r.fecha, 'yyyy-MM-dd') === fechaStr
     );
 
-    let totalMinutosFuncionamiento = 0;
-    let totalMinutosReservados = 0;
+    let algunaVentanaDisponible = false;
 
-    ventanas.forEach((ventana) => {
-      const [hInicio, mInicio] = ventana.hora_apertura.split(':').map(Number);
-      const [hFin, mFin] = ventana.hora_cierre.split(':').map(Number);
-      totalMinutosFuncionamiento += (hFin * 60 + mFin) - (hInicio * 60 + mInicio);
-    });
+    for (const ventana of ventanas) {
+      const [vhInicio, vmInicio] = ventana.hora_apertura.split(':').map(Number);
+      const [vhFin, vmFin] = ventana.hora_cierre.split(':').map(Number);
+      const inicioVentana = vhInicio * 60 + vmInicio;
+      const finVentana = vhFin * 60 + vmFin;
 
-    reservasEnFecha.forEach((r) => {
-      const [hInicio, mInicio] = r.hora_inicio.split(':').map(Number);
-      const [hFin, mFin] = r.hora_fin.split(':').map(Number);
-      totalMinutosReservados += (hFin * 60 + mFin) - (hInicio * 60 + mInicio);
-    });
+      // Creamos un array de 1440 minutos del día y marcamos la ventana como 1
+      const minutosDisponibles = new Array(1440).fill(0);
+      for (let i = inicioVentana; i < finVentana; i++) {
+        minutosDisponibles[i] = 1;
+      }
 
-    if (totalMinutosReservados >= totalMinutosFuncionamiento) {
-      disponibilidad[yyyyMM].no_disponibles.push(fechaStr);
-    } else {
+      // Marcamos en 0 los minutos ocupados por reservas
+      for (const r of reservasEnFecha) {
+        const [rhInicio, rmInicio] = r.hora_inicio.split(':').map(Number);
+        const [rhFin, rmFin] = r.hora_fin.split(':').map(Number);
+        const inicioReserva = rhInicio * 60 + rmInicio;
+        const finReserva = rhFin * 60 + rmFin;
+
+        for (let i = Math.max(inicioReserva, inicioVentana); i < Math.min(finReserva, finVentana); i++) {
+          minutosDisponibles[i] = 0;
+        }
+      }
+
+      const tieneMinutosDisponibles = minutosDisponibles.slice(inicioVentana, finVentana).includes(1);
+      if (tieneMinutosDisponibles) {
+        algunaVentanaDisponible = true;
+        break;
+      }
+    }
+
+    if (algunaVentanaDisponible) {
       disponibilidad[yyyyMM].disponibles.push(fechaStr);
+    } else {
+      disponibilidad[yyyyMM].no_disponibles.push(fechaStr);
     }
   }
 

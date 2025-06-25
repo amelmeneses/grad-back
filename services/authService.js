@@ -21,7 +21,7 @@ exports.loginUsuario = async (email, password) => {
       name: `${usuario.nombre}`,
     },
     process.env.JWT_SECRET,
-    { expiresIn: '2h' }
+    { expiresIn: '3h' }
   );
   return token;
 };
