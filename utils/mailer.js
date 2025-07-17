@@ -1,59 +1,45 @@
 // backend/utils/mailer.js
 const nodemailer = require('nodemailer');
 
-let etherealAccount = null;
-
 async function getTransporter() {
-  // ALWAYS use streamTransport when NOT in production
-  if (process.env.NODE_ENV !== 'production') {
+  // Si tienes SMTP real configurado, úsalo (Gmail)
+  if (process.env.MAIL_HOST && process.env.MAIL_USER && process.env.MAIL_PASS) {
     return nodemailer.createTransport({
-      streamTransport: true,
-      newline: 'unix',
-      buffer: true,
+      host: process.env.MAIL_HOST,              // smtp.gmail.com
+      port: Number(process.env.MAIL_PORT) || 587,
+      secure: process.env.MAIL_SECURE === 'true', // false para 587
+      auth: {
+        user: process.env.MAIL_USER,            // tu.email@gmail.com
+        pass: process.env.MAIL_PASS,            // tu App Password
+      },
     });
   }
 
-  // In production, create (or reuse) your Ethereal test account
-  if (!etherealAccount) {
-    etherealAccount = await nodemailer.createTestAccount();
-    console.log('🧪 Ethereal credentials:');
-    console.log('   user:', etherealAccount.user);
-    console.log('   pass:', etherealAccount.pass);
-  }
-
+  // Modo dev: imprime raw MIME en consola
   return nodemailer.createTransport({
-    host: etherealAccount.smtp.host,
-    port: etherealAccount.smtp.port,
-    secure: etherealAccount.smtp.secure,
-    auth: {
-      user: etherealAccount.user,
-      pass: etherealAccount.pass,
-    },
+    streamTransport: true,
+    newline: 'unix',
+    buffer: true,
   });
 }
 
-/**
- * Send a mail and in development print the raw MIME, in production return the Ethereal preview URL.
- */
 async function sendMail(to, subject, html) {
   const transporter = await getTransporter();
   const info = await transporter.sendMail({
-    from: '"Playbooker" <no-reply@playbooker.local>',
+    from: process.env.MAIL_FROM,
     to,
     subject,
     html,
   });
 
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('✉️  [dev] Raw email contents:\n');
-    console.log(info.message.toString());
+  // Si no hay MAIL_HOST, estamos en modo dev sin SMTP real
+  if (!process.env.MAIL_HOST) {
+    console.log('✉️  [dev] Raw email:\n', info.message.toString());
     return null;
-  } else {
-    console.log('✉️  Message sent:', info.messageId);
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    console.log('📬 Preview URL:', previewUrl);
-    return previewUrl;
   }
+
+  console.log('✉️  Email enviado, messageId:', info.messageId);
+  return info.messageId;
 }
 
 module.exports = { sendMail };
